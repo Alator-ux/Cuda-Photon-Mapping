@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CudaCompile Include="kernel.cu" />
+    <CudaCompile Include="PriorityQueueTest.cu">
+      <Filter>Tests</Filter>
+    </CudaCompile>
+    <CudaCompile Include="StackTest.cu">
+      <Filter>Tests</Filter>
+    </CudaCompile>
+    <CudaCompile Include="RaytraycingLayout.cu">
+      <Filter>Tests</Filter>
+    </CudaCompile>
+    <CudaCompile Include="PhotonTest.cu">
+      <Filter>Tests</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Test.cu">
+      <Filter>Tests</Filter>
+    </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Printers.h">
+      <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="PriorityQueue.cuh">
+      <Filter>DataStructures</Filter>
+    </ClInclude>
+    <ClInclude Include="Stack.cuh">
+      <Filter>DataStructures</Filter>
+    </ClInclude>
+    <ClInclude Include="Test.cuh">
+      <Filter>Tests</Filter>
+    </ClInclude>
+    <ClInclude Include="vec3.h">
+      <Filter>DataStructures</Filter>
+    </ClInclude>
+    <ClInclude Include="Tree.cuh">
+      <Filter>DataStructures</Filter>
+    </ClInclude>
+    <ClInclude Include="Photon.cuh">
+      <Filter>DataStructures</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Tests">
+      <UniqueIdentifier>{780e6d14-61b0-4876-8fbe-e022926c2090}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tools">
+      <UniqueIdentifier>{1d5ec51a-674c-438d-b639-947834fa7ec5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructures">
+      <UniqueIdentifier>{9f73d2ce-3410-4755-be28-bf3eac53d999}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Printers.cpp">
+      <Filter>Tools</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
