@@ -17,6 +17,9 @@
     <CudaCompile Include="Test.cu">
       <Filter>Tests</Filter>
     </CudaCompile>
+    <CudaCompile Include="TreeTest.cu">
+      <Filter>Tests</Filter>
+    </CudaCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Printers.h">

@@ -20,13 +20,16 @@ namespace cpm {
             this->heap = heap;
             this->size = 0;
             this->capacity = capacity - 1;
-            depth = hceil(log2f(capacity + 1)) - 1;
+            depth = ceilf(log2f(capacity + 1)) - 1;
         }
         __host__ __device__ Tree(size_t capacity) {
             this->heap = (ElemType**)malloc(capacity * sizeof(ElemType*));
             this->size = 0;
             this->capacity = capacity - 1;
-            depth = hceil(log2f(capacity + 1)) - 1;
+            depth = ceilf(log2f(capacity + 1)) - 1;
+        }
+        __host__ __device__ int set_root(ElemType* value) {
+            return add(0, value);
         }
         __host__ __device__ int add_left(int parent, ElemType* child) {
             int left = parent * 2 + 1;
@@ -36,11 +39,40 @@ namespace cpm {
             int right = parent * 2 + 2;
             return add(right, child);
         }
+        __host__ __device__ bool has_root() {
+            return heap[0] != nullptr;
+        }
+        __host__ __device__ bool has_left(int parent) {
+            int left = parent * 2 + 1;
+            if (left > capacity) {
+                return false;
+            }
+            return heap[left] != nullptr;
+        }
+        __host__ __device__ bool has_right(int parent) {
+            int right = parent * 2 + 2;
+            if (right > capacity) {
+                return false;
+            }
+            return heap[right] != nullptr;
+        }
+        __host__ __device__ ElemType* get_root() {
+            if (has_root()) {
+                return heap[0];
+            }
+            return nullptr;
+        }
         __host__ __device__ ElemType* get_left(int parent) {
-            return parent * 2 + 1;
+            if (has_left(parent)) {
+                return heap[parent * 2 + 1];
+            }
+            return nullptr;
         }
         __host__ __device__ ElemType* get_right(int parent) {
-            return parent * 2 + 2;
+            if (has_right(parent)) {
+                return heap[parent * 2 + 2];
+            }
+            return nullptr;
         }
         /*__host__ __device__ int* get_traversal_order() {
             int double_depth = 2 * depth;

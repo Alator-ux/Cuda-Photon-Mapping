@@ -7,4 +7,5 @@ int main(int argc, char * argv[]) {
     ctest::PQTest();
     ctest::StackTest();
     ctest::PhotonTest();
+    ctest::TreeTest();
 }

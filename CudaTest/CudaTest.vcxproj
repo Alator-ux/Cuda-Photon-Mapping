@@ -149,6 +149,7 @@
     <CudaCompile Include="RaytraycingLayout.cu" />
     <CudaCompile Include="StackTest.cu" />
     <CudaCompile Include="Test.cu" />
+    <CudaCompile Include="TreeTest.cu" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
