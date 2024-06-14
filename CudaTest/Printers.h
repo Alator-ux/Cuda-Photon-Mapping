@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include "vec3.cuh"
 template<typename T>
 void print_array(T* array, size_t size) {
 	for (int i = 0; i < size; i++) {
@@ -14,3 +15,5 @@ void println_array(T* array, size_t size) {
 }
 
 void println_divider();
+
+void println_vec3(cpm::vec3 vec3);

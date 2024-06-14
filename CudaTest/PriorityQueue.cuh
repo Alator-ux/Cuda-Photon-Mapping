@@ -7,9 +7,12 @@ namespace cpm {
 
     template <typename ElemType, typename ComparatorType>
     class priority_queue {
+    protected:
         ElemType* heapData;
-        size_t _size, _capacity;
         ComparatorType comparator;
+    private:
+        size_t _size, _capacity;
+    
 
         __host__ __device__ void heapify_up(int index) {
             bool swap = true;
@@ -51,17 +54,16 @@ namespace cpm {
         }
 
     public:
-        __host__ __device__ priority_queue(size_t capacity) {
+        __host__ __device__ priority_queue() : comparator(){}
+        __host__ __device__ priority_queue(size_t capacity) : comparator() {
             heapData = new ElemType[capacity];
             _size = 0;
             _capacity = capacity;
-            comparator = ComparatorType();
         }
-        __host__ __device__ priority_queue(ElemType* data, size_t capacity) {
+        __host__ __device__ priority_queue(ElemType* data, size_t capacity) : comparator() {
             heapData = data;
             _size = 0;
             _capacity = capacity;
-            comparator = ComparatorType();
         }
 
 
@@ -72,6 +74,10 @@ namespace cpm {
         }
 
         __host__ __device__ void pop() {
+            if (_size == 1) {
+                _size = 0;
+                return;
+            }
             if (!empty()) {
                 thrust::swap(heapData[0], heapData[_size - 1]);
                 _size--;

@@ -143,25 +143,32 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <CudaCompile Include="math_functions.cuh" />
+    <CudaCompile Include="PhotonMap.cu" />
+    <CudaCompile Include="PhotonMapGetClosestTest.cu" />
+    <CudaCompile Include="PhotonMapInsertTest.cu" />
     <CudaCompile Include="PhotonTest.cu" />
     <CudaCompile Include="PriorityQueueTest.cu" />
     <CudaCompile Include="kernel.cu" />
-    <CudaCompile Include="RaytraycingLayout.cu" />
     <CudaCompile Include="StackTest.cu" />
     <CudaCompile Include="Test.cu" />
     <CudaCompile Include="TreeTest.cu" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
+    <ClInclude Include="ArrayTools.cuh" />
+    <ClInclude Include="DeepLookStack.cuh" />
+    <ClInclude Include="FourTuple.cuh" />
+    <ClInclude Include="Pair.cuh" />
     <ClInclude Include="Photon.cuh" />
+    <ClInclude Include="PhotonMap.cuh" />
     <ClInclude Include="Printers.h" />
     <ClInclude Include="PriorityQueue.cuh" />
+    <ClInclude Include="Sort.cuh" />
     <ClInclude Include="Test.cuh" />
     <ClInclude Include="Stack.cuh" />
+    <ClInclude Include="TestablePhotonMap.cuh" />
     <ClInclude Include="Tree.cuh" />
-    <ClInclude Include="vec3.h" />
+    <ClInclude Include="vec3.cuh" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Printers.cpp" />
@@ -169,14 +176,5 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 12.2.targets" />
-    <Import Project="..\packages\boost.1.84.0\build\boost.targets" Condition="Exists('..\packages\boost.1.84.0\build\boost.targets')" />
-    <Import Project="..\packages\gtest.1.7.0\build\native\gtest.targets" Condition="Exists('..\packages\gtest.1.7.0\build\native\gtest.targets')" />
   </ImportGroup>
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>Данный проект ссылается на пакеты NuGet, отсутствующие на этом компьютере. Используйте восстановление пакетов NuGet, чтобы скачать их.  Дополнительную информацию см. по адресу: http://go.microsoft.com/fwlink/?LinkID=322105. Отсутствует следующий файл: {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\boost.1.84.0\build\boost.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost.1.84.0\build\boost.targets'))" />
-    <Error Condition="!Exists('..\packages\gtest.1.7.0\build\native\gtest.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\gtest.1.7.0\build\native\gtest.targets'))" />
-  </Target>
 </Project>

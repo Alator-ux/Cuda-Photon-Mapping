@@ -19,16 +19,25 @@ namespace cpm {
             delete[] data;
         }
 
+        __host__ __device__ size_t getSize() const {
+            return size;
+        }
+
+        __host__ __device__ size_t getCapacity() const {
+            return capacity;
+        }
+
         __host__ __device__ bool isEmpty() const {
             return size == 0;
         }
 
         __host__ __device__ bool isFull() const {
-            return size >= capacity;
+            return size > capacity;
         }
 
         __host__ __device__ void push(ElemType value) {
             if (!isFull()) {
+                printf("       pushed      ");
                 data[size] = value;
                 size += 1;
             }

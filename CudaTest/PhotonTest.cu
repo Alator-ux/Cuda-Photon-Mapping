@@ -1,6 +1,5 @@
 #include "Test.cuh"
 #include "Photon.cuh"
-
 void __host__ __device__ TestCore(cpm::Photon *photon, float* vres) {
 	vres[0] = photon->pos.x();
 	vres[1] = photon->pos.y();
@@ -19,7 +18,7 @@ void __global__ TestFromHostToDevice(cpm::Photon *photon, float* vres) {
 }
 
 void __device__ DeviceTestCore(float* vres) {
-	auto photon = cpm::Photon(vec3(1, 1, 1), vec3(2.0, 1.0, 1.0), vec3(3.f, 1.f, 2.f));
+	auto photon = cpm::Photon(cpm::vec3(1, 1, 1), cpm::vec3(2.0, 1.0, 1.0), cpm::vec3(3.f, 1.f, 2.f));
 	TestCore(&photon, vres);
 }
 void __global__ TestFromDevice(float* vres) {
@@ -27,7 +26,7 @@ void __global__ TestFromDevice(float* vres) {
 }
 
 void __device__ SecondDeviceTestCore(float* vres) {
-	auto other_photon = cpm::Photon(vec3(1, 1, 1), vec3(2.0, 1.0, 1.0), vec3(3.f, 1.f, 2.f));
+	auto other_photon = cpm::Photon(cpm::vec3(1, 1, 1), cpm::vec3(2.0, 1.0, 1.0), cpm::vec3(3.f, 1.f, 2.f));
 	auto photon = cpm::Photon(other_photon);
 	TestCore(&photon, vres);
 }
@@ -54,7 +53,7 @@ void ctest::PhotonTest() {
 	//---------------------------------------------//
 	cpm::Photon* photon;
 	cudaMallocManaged((void**)&photon, sizeof(cpm::Photon));
-	new (photon) cpm::Photon(vec3(1.f, 1.f, 1.f), vec3(2.f, 1.f, 1.f), vec3(3.f, 1.f, 2.f));
+	new (photon) cpm::Photon(cpm::vec3(1.f, 1.f, 1.f), cpm::vec3(2.f, 1.f, 1.f), cpm::vec3(3.f, 1.f, 2.f));
 
 	TestFromHostToDevice << <1, 1 >> > (photon, vres_device);
 	check_errors();

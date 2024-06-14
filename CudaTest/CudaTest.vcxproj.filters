@@ -8,9 +8,6 @@
     <CudaCompile Include="StackTest.cu">
       <Filter>Tests</Filter>
     </CudaCompile>
-    <CudaCompile Include="RaytraycingLayout.cu">
-      <Filter>Tests</Filter>
-    </CudaCompile>
     <CudaCompile Include="PhotonTest.cu">
       <Filter>Tests</Filter>
     </CudaCompile>
@@ -18,6 +15,18 @@
       <Filter>Tests</Filter>
     </CudaCompile>
     <CudaCompile Include="TreeTest.cu">
+      <Filter>Tests</Filter>
+    </CudaCompile>
+    <CudaCompile Include="PhotonMap.cu">
+      <Filter>DataStructures</Filter>
+    </CudaCompile>
+    <CudaCompile Include="PhotonMapInsertTest.cu">
+      <Filter>Tests</Filter>
+    </CudaCompile>
+    <CudaCompile Include="math_functions.cuh">
+      <Filter>Tools</Filter>
+    </CudaCompile>
+    <CudaCompile Include="PhotonMapGetClosestTest.cu">
       <Filter>Tests</Filter>
     </CudaCompile>
   </ItemGroup>
@@ -28,13 +37,10 @@
     <ClInclude Include="PriorityQueue.cuh">
       <Filter>DataStructures</Filter>
     </ClInclude>
-    <ClInclude Include="Stack.cuh">
-      <Filter>DataStructures</Filter>
-    </ClInclude>
     <ClInclude Include="Test.cuh">
       <Filter>Tests</Filter>
     </ClInclude>
-    <ClInclude Include="vec3.h">
+    <ClInclude Include="vec3.cuh">
       <Filter>DataStructures</Filter>
     </ClInclude>
     <ClInclude Include="Tree.cuh">
@@ -43,9 +49,30 @@
     <ClInclude Include="Photon.cuh">
       <Filter>DataStructures</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
+    <ClInclude Include="Stack.cuh">
+      <Filter>DataStructures</Filter>
+    </ClInclude>
+    <ClInclude Include="ArrayTools.cuh">
+      <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="DeepLookStack.cuh">
+      <Filter>DataStructures</Filter>
+    </ClInclude>
+    <ClInclude Include="FourTuple.cuh">
+      <Filter>DataStructures</Filter>
+    </ClInclude>
+    <ClInclude Include="Pair.cuh">
+      <Filter>DataStructures</Filter>
+    </ClInclude>
+    <ClInclude Include="PhotonMap.cuh">
+      <Filter>DataStructures</Filter>
+    </ClInclude>
+    <ClInclude Include="Sort.cuh">
+      <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="TestablePhotonMap.cuh">
+      <Filter>DataStructures\TestDataStructures</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Tests">
@@ -56,6 +83,9 @@
     </Filter>
     <Filter Include="DataStructures">
       <UniqueIdentifier>{9f73d2ce-3410-4755-be28-bf3eac53d999}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructures\TestDataStructures">
+      <UniqueIdentifier>{e21638f2-0d0e-46fc-b6c0-42fb49f90f51}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

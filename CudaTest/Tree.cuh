@@ -28,8 +28,16 @@ namespace cpm {
             this->capacity = capacity - 1;
             depth = ceilf(log2f(capacity + 1)) - 1;
         }
+        __host__ __device__ ~Tree() {
+            // TODO
+        }
+       /* template<typename Comparator>
+        __host__ __device__ void fill_balanced()*/
         __host__ __device__ int set_root(ElemType* value) {
             return add(0, value);
+        }
+        __host__ __device__ int set_at(int index, ElemType* value) {
+            return add(index, value);
         }
         __host__ __device__ int add_left(int parent, ElemType* child) {
             int left = parent * 2 + 1;
@@ -56,6 +64,15 @@ namespace cpm {
             }
             return heap[right] != nullptr;
         }
+        __host__ __device__ bool is_leaf(int index) {
+            return !(has_left(index) || has_right(index));
+        }
+        __host__ __device__ bool is_siblings(int index, int other) {
+            if (index % 2 == 1) {
+                return other - index == 1;
+            }
+            return index - other == 1;
+        }
         __host__ __device__ ElemType* get_root() {
             if (has_root()) {
                 return heap[0];
@@ -73,6 +90,26 @@ namespace cpm {
                 return heap[parent * 2 + 2];
             }
             return nullptr;
+        }
+        __host__ __device__ int get_left_ind(int parent) {
+            int left = parent * 2 + 1;
+            if (left > capacity) {
+                left = -1;
+            }
+            return left;
+        }
+        __host__ __device__ int get_right_ind(int parent) {
+            int right = parent * 2 + 2;
+            if (right > capacity) {
+                right = -1;
+            }
+            return right;
+        }
+        __host__ __device__ int get_capacity() {
+            return capacity + 1;
+        }
+        __host__ __device__ int get_depth() {
+            return depth;
         }
         /*__host__ __device__ int* get_traversal_order() {
             int double_depth = 2 * depth;

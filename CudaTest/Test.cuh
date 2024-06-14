@@ -5,13 +5,16 @@
 #include "Stack.cuh"
 #include "Printers.h"
 #include "PriorityQueue.cuh"
+#include "Photon.cuh"
+#include "Tree.cuh"
 
 namespace ctest {
 	void PQTest();
 	void StackTest();
 	void PhotonTest();
 	void TreeTest();
-	void RTLayoutTest();
+	void PhotonMapInsertTest();
+	void PhotonMapGetClosestTest();
 
 	template<typename T>
 	void is_matched(size_t size, T* expected, T* res, bool* out) {

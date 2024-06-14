@@ -3,10 +3,10 @@
 #include "Tree.cuh"
 
 void __host__ __device__ TestCore(cpm::Tree<cpm::Photon>* tree, float* vres, bool* bres) {
-	auto root = cpm::Photon(vec3(1), vec3(1), vec3(1));
-	auto left = cpm::Photon(vec3(2), vec3(2), vec3(2));
-	auto right = cpm::Photon(vec3(3), vec3(3), vec3(3));
-	auto left_right = cpm::Photon(vec3(4), vec3(4), vec3(4));
+	auto root = cpm::Photon(cpm::vec3(1), cpm::vec3(1), cpm::vec3(1));
+	auto left = cpm::Photon(cpm::vec3(2), cpm::vec3(2), cpm::vec3(2));
+	auto right = cpm::Photon(cpm::vec3(3), cpm::vec3(3), cpm::vec3(3));
+	auto left_right = cpm::Photon(cpm::vec3(4), cpm::vec3(4), cpm::vec3(4));
 	tree->set_root(&root);
 	int left_ind = tree->add_left(0, &left);
 	int right_ind = tree->add_right(0, &right);

@@ -4,8 +4,10 @@
 
 int main(int argc, char * argv[]) {
     setlocale(LC_ALL, "");
-    ctest::PQTest();
-    ctest::StackTest();
-    ctest::PhotonTest();
-    ctest::TreeTest();
+    //ctest::PQTest();
+    //ctest::StackTest();
+    //ctest::PhotonTest();
+    //ctest::TreeTest();
+    //ctest::PhotonMapInsertTest();
+    ctest::PhotonMapGetClosestTest();
 }

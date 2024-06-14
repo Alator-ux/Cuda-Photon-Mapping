@@ -1,7 +1,7 @@
 #pragma once
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
-#include "vec3.h"
+#include "vec3.cuh"
 
 namespace cpm {
     struct Photon {
