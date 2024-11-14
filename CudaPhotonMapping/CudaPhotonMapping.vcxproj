@@ -20,7 +20,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{CC483C5A-BDF2-47BF-BF46-6A420F29766C}</ProjectGuid>
-    <RootNamespace>CudaTest</RootNamespace>
+    <RootNamespace>CudaPhotonMapping</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -161,6 +161,7 @@
     <ClInclude Include="ArrayTools.cuh" />
     <ClInclude Include="DeepLookStack.cuh" />
     <ClInclude Include="FourTuple.cuh" />
+    <ClInclude Include="ObjLoader.h" />
     <ClInclude Include="Pair.cuh" />
     <ClInclude Include="Photon.cuh" />
     <ClInclude Include="PhotonMap.cuh" />
@@ -176,6 +177,7 @@
     <ClInclude Include="vec3_funcs.cuh" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ObjLoader.cpp" />
     <ClCompile Include="Printers.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

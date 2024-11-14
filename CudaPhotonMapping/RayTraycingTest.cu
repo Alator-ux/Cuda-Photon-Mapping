@@ -50,6 +50,8 @@ void ctest::RayTracingTest() {
 	//---------------------------------------------//
 	//print_frame_buffer(frame_buffer, fb_width, fb_height);
 	checkCudaErrors(cudaFree(frame_buffer));
+	
+	
 
 	println_divider();
 }

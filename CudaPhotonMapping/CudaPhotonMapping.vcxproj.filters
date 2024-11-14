@@ -88,6 +88,7 @@
     <ClInclude Include="vec3_funcs.cuh">
       <Filter>Tools\vec3_funcs</Filter>
     </ClInclude>
+    <ClInclude Include="ObjLoader.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Tests">
@@ -108,10 +109,17 @@
     <Filter Include="Tools\vec3_funcs">
       <UniqueIdentifier>{fd4d4085-9e17-4b98-9ef4-b718a3889f4d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Loaders">
+      <UniqueIdentifier>{def8fadd-c765-4f23-8800-3ce98ea64ced}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Loaders\ModelLoader">
+      <UniqueIdentifier>{9f284c92-7a1e-46e5-bc43-5dee900c4efb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Printers.cpp">
       <Filter>Tools</Filter>
     </ClCompile>
+    <ClCompile Include="ObjLoader.cpp" />
   </ItemGroup>
 </Project>
