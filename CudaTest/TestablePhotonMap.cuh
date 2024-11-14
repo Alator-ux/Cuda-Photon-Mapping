@@ -37,7 +37,7 @@ namespace cpm
             np.container->fpush(npn);
             locate_q(np);
             if (np.container->size() > count) {
-                np.container->pop();
+                //np.container->pop();
             }
             for (int i = 0; i < np.container->size(); i++) {
                 printf("sq dist %f\n", (*np.container)[i].sq_dist);

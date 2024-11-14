@@ -150,9 +150,12 @@
     <CudaCompile Include="PhotonTest.cu" />
     <CudaCompile Include="PriorityQueueTest.cu" />
     <CudaCompile Include="kernel.cu" />
+    <CudaCompile Include="Ray.cu" />
+    <CudaCompile Include="RayTraycingTest.cu" />
     <CudaCompile Include="StackTest.cu" />
     <CudaCompile Include="Test.cu" />
     <CudaCompile Include="TreeTest.cu" />
+    <CudaCompile Include="vec3_funcs.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArrayTools.cuh" />
@@ -163,12 +166,14 @@
     <ClInclude Include="PhotonMap.cuh" />
     <ClInclude Include="Printers.h" />
     <ClInclude Include="PriorityQueue.cuh" />
+    <ClInclude Include="Ray.cuh" />
     <ClInclude Include="Sort.cuh" />
     <ClInclude Include="Test.cuh" />
     <ClInclude Include="Stack.cuh" />
     <ClInclude Include="TestablePhotonMap.cuh" />
     <ClInclude Include="Tree.cuh" />
     <ClInclude Include="vec3.cuh" />
+    <ClInclude Include="vec3_funcs.cuh" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Printers.cpp" />

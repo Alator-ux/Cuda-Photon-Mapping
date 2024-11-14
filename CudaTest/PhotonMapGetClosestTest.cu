@@ -5,7 +5,7 @@
 
 void __host__ __device__ TestCore(cpm::Photon* photons, size_t size, const cpm::vec3& point, cpm::vec3* vres) {
 	auto pm = cpm::TestablePhotonMap(cpm::TestablePhotonMap::caustic, photons, size);
-	pm.get_closest_to_point(point, 3, vres);
+	pm.get_closest_to_point(point, 4, vres);
 }
 
 void __global__ TestFromDevice(cpm::Photon* photons, size_t size, cpm::vec3* point, cpm::vec3* vres) {
@@ -39,16 +39,16 @@ void ctest::PhotonMapGetClosestTest() {
 	*
 	*/
 
-	const size_t res_size = 3;
+	const size_t res_size = 4;
 	cpm::vec3 vres_host[res_size];
 	cpm::vec3 vexpected[] = {
 		cpm::vec3(30, 5, 0), // 64
 		cpm::vec3(40, 1, 10), // 50
 		cpm::vec3(80, 9, 40),
+		cpm::vec3(0, 3, 21), // 82
 
 		//cpm::vec3(-10, 7, 20), // 92
 		//cpm::vec3(-50, 4, 30),// 130
-		//cpm::vec3(0, 3, 21), // 82
 	};
 	bool vmatched[res_size];
 

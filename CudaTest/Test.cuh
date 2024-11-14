@@ -7,6 +7,11 @@
 #include "PriorityQueue.cuh"
 #include "Photon.cuh"
 #include "Tree.cuh"
+#include "Ray.cuh"
+
+#define checkCudaErrors(val) check_cuda( (val), #val, __FILE__, __LINE__ )
+
+void check_cuda(cudaError_t result, char const* const func, const char* const file, int const line);
 
 namespace ctest {
 	void PQTest();
@@ -15,6 +20,7 @@ namespace ctest {
 	void TreeTest();
 	void PhotonMapInsertTest();
 	void PhotonMapGetClosestTest();
+	void RayTracingTest();
 
 	template<typename T>
 	void is_matched(size_t size, T* expected, T* res, bool* out) {

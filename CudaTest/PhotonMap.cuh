@@ -145,7 +145,7 @@ namespace cpm
             }
         };
         cpm::Tree<Node> tree;
-        float max_distance = 1000; // TODO перенести в cpp пока что
+        float max_distance = 10000; // TODO перенести в cpp пока что
     public:
         enum Type { def = 0, caustic };
 
@@ -330,9 +330,11 @@ protected:
                 printf("cap % d, ", tree.get_capacity());
                 
                 if (dist1 > 0.f) { // if dist1 is positive search right plane
-                    printf("right branch ");
-                    nodeq.push(NPNRNode(tree.get_right(loc_node.heap_ind), right_child_ind,
-                        loc_node.tree_depth + 1, loc_node.tree_depth + 1));
+                    if (tree.has_right(loc_node.heap_ind)) {
+                        printf("right branch ");
+                        nodeq.push(NPNRNode(tree.get_right(loc_node.heap_ind), right_child_ind,
+                            loc_node.tree_depth + 1, loc_node.tree_depth + 1));
+                    }
                     if (tree.has_left(loc_node.heap_ind) && dist1 * dist1 < np.container->max_dist()) {
                         printf("then right left branch ");
                         nodeq.push(NPNRNode(tree.get_left(loc_node.heap_ind), left_child_ind,
@@ -340,11 +342,13 @@ protected:
                     }
                 }
                 else { // dist1 is negative search left first
-                    printf("left branch ");
-                    nodeq.push(NPNRNode(tree.get_left(loc_node.heap_ind), left_child_ind,
-                        loc_node.tree_depth + 1, loc_node.tree_depth + 1));
+                    if (tree.has_left(loc_node.heap_ind)) {
+                        printf("left branch ");
+                        nodeq.push(NPNRNode(tree.get_left(loc_node.heap_ind), left_child_ind,
+                            loc_node.tree_depth + 1, loc_node.tree_depth + 1));
+                    }
                     if (tree.has_right(loc_node.heap_ind) && dist1 * dist1 < np.container->max_dist()) {
-                        printf("then left right branch");
+                        printf("then left right branch ");
                         nodeq.push(NPNRNode(tree.get_right(loc_node.heap_ind), right_child_ind,
                             loc_node.tree_depth + 1, double_depth - loc_node.tree_depth));
                     }

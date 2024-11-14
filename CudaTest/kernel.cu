@@ -9,5 +9,6 @@ int main(int argc, char * argv[]) {
     //ctest::PhotonTest();
     //ctest::TreeTest();
     //ctest::PhotonMapInsertTest();
-    ctest::PhotonMapGetClosestTest();
+    //ctest::PhotonMapGetClosestTest();
+    ctest::RayTracingTest();
 }

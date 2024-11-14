@@ -29,6 +29,15 @@
     <CudaCompile Include="PhotonMapGetClosestTest.cu">
       <Filter>Tests</Filter>
     </CudaCompile>
+    <CudaCompile Include="RayTraycingTest.cu">
+      <Filter>Tests</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Ray.cu">
+      <Filter>DataStructures\Ray</Filter>
+    </CudaCompile>
+    <CudaCompile Include="vec3_funcs.cu">
+      <Filter>Tools\vec3_funcs</Filter>
+    </CudaCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Printers.h">
@@ -73,6 +82,12 @@
     <ClInclude Include="TestablePhotonMap.cuh">
       <Filter>DataStructures\TestDataStructures</Filter>
     </ClInclude>
+    <ClInclude Include="Ray.cuh">
+      <Filter>DataStructures\Ray</Filter>
+    </ClInclude>
+    <ClInclude Include="vec3_funcs.cuh">
+      <Filter>Tools\vec3_funcs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Tests">
@@ -84,8 +99,14 @@
     <Filter Include="DataStructures">
       <UniqueIdentifier>{9f73d2ce-3410-4755-be28-bf3eac53d999}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DataStructures\Ray">
+      <UniqueIdentifier>{5a3f7972-7fb3-4857-8ee2-943bd8112e95}</UniqueIdentifier>
+    </Filter>
     <Filter Include="DataStructures\TestDataStructures">
       <UniqueIdentifier>{e21638f2-0d0e-46fc-b6c0-42fb49f90f51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tools\vec3_funcs">
+      <UniqueIdentifier>{fd4d4085-9e17-4b98-9ef4-b718a3889f4d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
