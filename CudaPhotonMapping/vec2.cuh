@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <crt/host_defines.h>
 #include "ostream"
 #include "iostream"
@@ -13,24 +13,21 @@
 #define USE_INTRINSICS
 #endif
 namespace cpm {
-    class vec3 {
+    class vec2 {
     public:
-        __host__ __device__ vec3() {
+        __host__ __device__ vec2() {
             _v[0] = 0.f;
             _v[1] = 0.f;
-            _v[2] = 0.f;
         }
 
-        __host__ __device__ vec3(float v) {
+        __host__ __device__ vec2(float v) {
             _v[0] = v;
             _v[1] = v;
-            _v[2] = v;
         }
 
-        __host__ __device__ vec3(float v1, float v2, float v3) {
+        __host__ __device__ vec2(float v1, float v2) {
             _v[0] = v1;
             _v[1] = v2;
-            _v[2] = v3;
         }
 
         // TODO: Use __saturatef to saturate float values
@@ -39,7 +36,6 @@ namespace cpm {
             return (
                 (_v[0] == 0.f)
                 && (_v[1] == 0.f)
-                && (_v[2] == 0.f)
                 );
         }
 
@@ -47,22 +43,19 @@ namespace cpm {
         // mostly do the same thing
         __host__ __device__ constexpr float u() const { return _v[0]; }
         __host__ __device__ constexpr float v() const { return _v[1]; }
-        __host__ __device__ constexpr float w() const { return _v[2]; }
         __host__ __device__ constexpr float x() const { return _v[0]; }
         __host__ __device__ constexpr float y() const { return _v[1]; }
-        __host__ __device__ constexpr float z() const { return _v[2]; }
         __host__ __device__ constexpr float r() const { return _v[0]; }
         __host__ __device__ constexpr float g() const { return _v[1]; }
-        __host__ __device__ constexpr float b() const { return _v[2]; }
 
-        // +vec3
-        __host__ __device__ constexpr const vec3& operator+() const {
+        // +vec2
+        __host__ __device__ constexpr const vec2& operator+() const {
             return *this;
         }
 
-        // -vec3 (to negate)
-        __host__ __device__ inline vec3 operator-() const {
-            return vec3(-_v[0], -_v[1], -_v[2]);
+        // -vec2 (to negate)
+        __host__ __device__ inline vec2 operator-() const {
+            return vec2(-_v[0], -_v[1]);
         }
 
         // vect3[i]
@@ -74,82 +67,70 @@ namespace cpm {
             return _v[i];
         };
 
-        __host__ __device__ constexpr vec3& operator+=(const vec3& v) {
+        __host__ __device__ constexpr vec2& operator+=(const vec2& v) {
 #ifdef USE_INTRINSICS
             _v[0] = __fadd_rz(_v[0], v._v[0]);
             _v[1] = __fadd_rz(_v[1], v._v[1]);
-            _v[2] = __fadd_rz(_v[2], v._v[2]);
 #else
             _v[0] += v._v[0];
             _v[1] += v._v[1];
-            _v[2] += v._v[2];
 #endif
             return *this;
         }
 
-        __host__ __device__ constexpr vec3& operator-=(const vec3& v) {
+        __host__ __device__ constexpr vec2& operator-=(const vec2& v) {
 #ifdef USE_INTRINSICS
             _v[0] = __fsub_rz(_v[0], v._v[0]);
             _v[1] = __fsub_rz(_v[1], v._v[1]);
-            _v[2] = __fsub_rz(_v[2], v._v[2]);
 #else
             _v[0] -= v._v[0];
             _v[1] -= v._v[1];
-            _v[2] -= v._v[2];
 #endif
             return *this;
         }
 
-        __host__ __device__ constexpr vec3& operator*=(const vec3& v) {
+        __host__ __device__ constexpr vec2& operator*=(const vec2& v) {
 #ifdef USE_INTRINSICS
             _v[0] = __fmul_rz(_v[0], v._v[0]);
             _v[1] = __fmul_rz(_v[1], v._v[1]);
-            _v[2] = __fmul_rz(_v[2], v._v[2]);
 #else
             _v[0] *= v._v[0];
             _v[1] *= v._v[1];
-            _v[2] *= v._v[2];
 #endif
             return *this;
         }
 
-        __host__ __device__ constexpr vec3& operator/=(const vec3& v) {
+        __host__ __device__ constexpr vec2& operator/=(const vec2& v) {
 #ifdef USE_INTRINSICS
             _v[0] = __fdiv_rz(_v[0], v._v[0]);
             _v[1] = __fdiv_rz(_v[1], v._v[1]);
-            _v[2] = __fdiv_rz(_v[2], v._v[2]);
 #else
             _v[0] /= v._v[0];
             _v[1] /= v._v[1];
-            _v[2] /= v._v[2];
 #endif
             return *this;
         }
 
-        __host__ __device__ constexpr vec3& operator*=(const float f) {
+        __host__ __device__ constexpr vec2& operator*=(const float f) {
 #ifdef USE_INTRINSICS
             _v[0] = __fmul_rz(_v[0], f);
             _v[1] = __fmul_rz(_v[1], f);
-            _v[2] = __fmul_rz(_v[2], f);
 #else
             _v[0] *= f;
             _v[1] *= f;
-            _v[2] *= f;
 #endif
             return *this;
         }
 
-        __host__ __device__ constexpr vec3& operator/=(const float f) {
+        __host__ __device__ constexpr vec2& operator/=(const float f) {
 #ifdef USE_INTRINSICS
             float u = __fdiv_rz(1.0f, f);
             _v[0] = __fmul_rz(_v[0], u);
             _v[1] = __fmul_rz(_v[1], u);
-            _v[2] = __fmul_rz(_v[2], u);
 #else
             float u = 1.0f / f;
             _v[0] *= u;
             _v[1] *= u;
-            _v[2] *= u;
 #endif
             return *this;
         }
@@ -160,11 +141,10 @@ namespace cpm {
                 __fsqrt_rz(
                     __fmul_rz(_v[0], _v[0])
                     + __fmul_rz(_v[1], _v[1])
-                    + __fmul_rz(_v[2], _v[2])
                 );
 #else
             return sqrt(
-                _v[0] * _v[0] + _v[1] * _v[1] + _v[2] * _v[2]
+                _v[0] * _v[0] + _v[1] * _v[1]
             );
 #endif
         }
@@ -175,22 +155,20 @@ namespace cpm {
                 (
                     __fmul_rz(_v[0], _v[0])
                     + __fmul_rz(_v[1], _v[1])
-                    + __fmul_rz(_v[2], _v[2])
                     );
 #else
-            return (_v[0] * _v[0] + _v[1] * _v[1] + _v[2] * _v[2]);
+            return (_v[0] * _v[0] + _v[1] * _v[1]);
 #endif
         }
 
-        __host__ __device__ inline vec3 gamma_correct() const {
+        __host__ __device__ inline vec2 gamma_correct() const {
 #ifdef USE_INTRINSICS
-            return vec3(
+            return vec2(
                 __fsqrt_rz(_v[0]),
                 __fsqrt_rz(_v[1]),
-                __fsqrt_rz(_v[2])
             );
 #else
-            return vec3(sqrt(_v[0]), sqrt(_v[1]), sqrt(_v[2]));
+            return vec2(sqrt(_v[0]), sqrt(_v[1]));
 #endif
         }
 
@@ -200,47 +178,44 @@ namespace cpm {
             }
         }
 
-        __host__ __device__ static inline vec3 normalize(vec3 v) {
+        __host__ __device__ static inline vec2 normalize(vec2 v) {
             if (v.is_null()) {
                 return v;
             }
             else {
                 return v / v.length();
             }
+
         }
 
-        __host__ __device__ static inline vec3 abs(vec3 v) {
+        __host__ __device__ static inline vec2 abs(vec2 v) {
             if (v.is_null()) {
                 return v;
             }
-            else {
-                if (v._v[0] < 0)
-                    v._v[0] = -v._v[0];
-                if (v._v[1] < 0)
-                    v._v[1] = -v._v[1];
-                if (v._v[2] < 0)
-                    v._v[2] = -v._v[2];
-            }
+
+            if (v._v[0] < 0)
+                v._v[0] = -v._v[0];
+            if (v._v[1] < 0)
+                v._v[1] = -v._v[1];
         }
 
         // dot product
-        __host__ __device__ static constexpr float dot(const vec3& v1, const vec3& v2) {
+        __host__ __device__ static constexpr float dot(const vec2& v1, const vec2& v2) {
 #ifdef USE_INTRINSICS
             return
                 (
                     __fmul_rz(v1._v[0], v2._v[0])
                     + __fmul_rz(v1._v[1], v2._v[1])
-                    + __fmul_rz(v1._v[2], v2._v[2])
                     );
 #else
-            return v1._v[0] * v2._v[0] + v1._v[1] * v2._v[1] + v1._v[2] * v2._v[2];
+            return v1._v[0] * v2._v[0] + v1._v[1] * v2._v[1];
 #endif
         }
 
-        __host__ __device__ static inline vec3 cross(const vec3& v1, const vec3& v2) {
+        __host__ __device__ static inline vec2 cross(const vec2& v1, const vec2& v2) {
 #ifdef USE_INTRINSICS
             return
-                vec3(
+                vec2(
                     __fsub_rz(
                         __fmul_rz(v1._v[1], v2._v[2]),
                         __fmul_rz(v1._v[2], v2._v[1])
@@ -251,138 +226,125 @@ namespace cpm {
                             __fmul_rz(v1._v[2], v2._v[0])
                         ),
                         -1
-                    ),
-                    __fsub_rz(
-                        __fmul_rz(v1._v[0], v2._v[1]),
-                        __fmul_rz(v1._v[1], v2._v[0])
                     )
                 );
 #else
-            return vec3((v1._v[1] * v2._v[2] - v1._v[2] * v2._v[1]),
-                (-(v1._v[0] * v2._v[2] - v1._v[2] * v2._v[0])),
-                (v1._v[0] * v2._v[1] - v1._v[1] * v2._v[0]));
+            return vec2((v1._v[1] * v2._v[2] - v1._v[2] * v2._v[1]),
+                (-(v1._v[0] * v2._v[2] - v1._v[2] * v2._v[0])));
 #endif
         }
 
-        friend std::ostream& operator<<(std::ostream& os, const vec3& v) {
-            os << "(" << v._v[0] << "," << v._v[1] << "," << v._v[2] << ")";
+        friend std::ostream& operator<<(std::ostream& os, const vec2& v) {
+            os << "(" << v._v[0] << "," << v._v[1] << ")";
             return os;
         }
 
-        friend std::istream& operator>>(std::istream& is, vec3& v) {
-            is >> v._v[0] >> v._v[1] >> v._v[2];
+        friend std::istream& operator>>(std::istream& is, vec2& v) {
+            is >> v._v[0] >> v._v[1];
             return is;
         }
 
-        __host__ __device__ friend inline vec3 operator+(const vec3& v1, const vec3& v2) {
+        __host__ __device__ friend inline vec2 operator+(const vec2& v1, const vec2& v2) {
 #ifdef USE_INTRINSICS
             return
-                vec3(
+                vec2(
                     __fadd_rz(v1._v[0], v2._v[0]),
                     __fadd_rz(v1._v[1], v2._v[1]),
-                    __fadd_rz(v1._v[2], v2._v[2])
                 );
 #else
-            return vec3(v1._v[0] + v2._v[0], v1._v[1] + v2._v[1], v1._v[2] + v2._v[2]);
+            return vec2(v1._v[0] + v2._v[0], v1._v[1] + v2._v[1]);
 #endif
         }
 
-        __host__ __device__ friend inline vec3 operator-(const vec3& v1, const vec3& v2) {
+        __host__ __device__ friend inline vec2 operator-(const vec2& v1, const vec2& v2) {
 #ifdef USE_INTRINSICS
             return
-                vec3(
+                vec2(
                     __fsub_rz(v1._v[0], v2._v[0]),
                     __fsub_rz(v1._v[1], v2._v[1]),
-                    __fsub_rz(v1._v[2], v2._v[2])
                 );
 #else
-            return vec3(v1._v[0] - v2._v[0], v1._v[1] - v2._v[1], v1._v[2] - v2._v[2]);
+            return vec2(v1._v[0] - v2._v[0], v1._v[1] - v2._v[1]);
 #endif
         }
 
-        __host__ __device__ friend inline vec3 operator*(const vec3& v1, const vec3& v2) {
+        __host__ __device__ friend inline vec2 operator*(const vec2& v1, const vec2& v2) {
 #ifdef USE_INTRINSICS
             return
-                vec3(
+                vec2(
                     __fmul_rz(v1._v[0], v2._v[0]),
                     __fmul_rz(v1._v[1], v2._v[1]),
-                    __fmul_rz(v1._v[2], v2._v[2])
                 );
 #else
-            return vec3(v1._v[0] * v2._v[0], v1._v[1] * v2._v[1], v1._v[2] * v2._v[2]);
+            return vec2(v1._v[0] * v2._v[0], v1._v[1] * v2._v[1]);
 #endif
         }
 
-        __host__ __device__ friend inline vec3 operator/(const vec3& v1, const vec3& v2) {
+        __host__ __device__ friend inline vec2 operator/(const vec2& v1, const vec2& v2) {
 #ifdef USE_INTRINSICS
             return
-                vec3(
+                vec2(
                     __fdiv_rz(v1._v[0], v2._v[0]),
-                    __fdiv_rz(v1._v[1], v2._v[1]),
-                    __fdiv_rz(v1._v[2], v2._v[2])
+                    __fdiv_rz(v1._v[1], v2._v[1])
                 );
 #else
-            return vec3(v1._v[0] / v2._v[0], v1._v[1] / v2._v[1], v1._v[2] / v2._v[2]);
+            return vec2(v1._v[0] / v2._v[0], v1._v[1] / v2._v[1]);
 #endif
         }
 
-        __host__ __device__ friend inline vec3 operator*(float t, const vec3& v) {
+        __host__ __device__ friend inline vec2 operator*(float t, const vec2& v) {
 #ifdef USE_INTRINSICS
             return
-                vec3(
+                vec2(
                     __fmul_rz(v._v[0], t),
                     __fmul_rz(v._v[1], t),
-                    __fmul_rz(v._v[2], t)
                 );
 #else
-            return vec3(t * v._v[0], t * v._v[1], t * v._v[2]);
+            return vec2(t * v._v[0], t * v._v[1]);
 #endif
         }
 
-        __host__ __device__ friend inline vec3 operator*(const vec3& v, float t) {
+        __host__ __device__ friend inline vec2 operator*(const vec2& v, float t) {
 #ifdef USE_INTRINSICS
             return
-                vec3(
+                vec2(
                     __fmul_rz(v._v[0], t),
                     __fmul_rz(v._v[1], t),
-                    __fmul_rz(v._v[2], t)
                 );
 #else
-            return vec3(t * v._v[0], t * v._v[1], t * v._v[2]);
+            return vec2(t * v._v[0], t * v._v[1]);
 #endif
         }
 
-        __host__ __device__ friend inline vec3 operator/(vec3 v, float t) {
+        __host__ __device__ friend inline vec2 operator/(vec2 v, float t) {
 #ifdef USE_INTRINSICS
             return
-                vec3(
+                vec2(
                     __fdiv_rz(v._v[0], t),
                     __fdiv_rz(v._v[1], t),
-                    __fdiv_rz(v._v[2], t)
                 );
 #else
-            return vec3(v._v[0] / t, v._v[1] / t, v._v[2] / t);
+            return vec2(v._v[0] / t, v._v[1] / t);
 #endif
         }
 
-        __device__ inline vec3 saturate() const {
+        __device__ inline vec2 saturate() const {
 #ifdef USE_INTRINSICS
             return
-                vec3(
+                vec2(
                     __saturatef(_v[0]),
                     __saturatef(_v[1]),
-                    __saturatef(_v[2])
                 );
 #else
-            return vec3(-1.f, -1.f, -1.f);
+            return vec2(-1.f, -1.f);
 #endif
         }
 
-        __host__ __device__ inline bool operator==(vec3& other) const {
-            return x() == other.x() && y() == other.y() && z() && other.z();
+        __host__ __device__ inline bool operator==(vec2& other) const {
+            return x() == other.x() && y() == other.y();
         }
     private:
-        float _v[3];
+        float _v[2];
         //float eps = 1e-5;
     };
 }
