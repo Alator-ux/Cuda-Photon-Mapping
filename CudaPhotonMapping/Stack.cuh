@@ -36,17 +36,40 @@ namespace cpm {
         }
 
         __host__ __device__ void push(ElemType value) {
+#ifdef __CUDA_ARCH__
             if (!isFull()) {
-                printf("       pushed      ");
                 data[size] = value;
                 size += 1;
             }
+#else
+            if (isFull()) {
+                size_t new_capacity = capacity == 0 ? 1 : capacity * 2;
+                ElemType* new_data = (ElemType*)malloc(new_capacity * sizeof(ElemType));
+
+                for (size_t i = 0; i < capacity; i++) {
+                    new_data[i] = data[i];
+                }
+
+                free((void*)data);
+                data = new_data;
+                capacity = new_capacity;
+            }
+            data[size] = value;
+            size += 1;
+#endif
         }
 
         __host__ __device__ void pop() {
             if (size > 0) {
                 size -= 1;
             }
+        }
+
+        __host__ __device__ ElemType* top_pointer() const {
+            if (!isEmpty()) {
+                return data + (size - 1);
+            }
+            return nullptr;
         }
 
         __host__ __device__ ElemType top() const {

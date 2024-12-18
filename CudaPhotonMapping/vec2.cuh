@@ -165,7 +165,7 @@ namespace cpm {
 #ifdef USE_INTRINSICS
             return vec2(
                 __fsqrt_rz(_v[0]),
-                __fsqrt_rz(_v[1]),
+                __fsqrt_rz(_v[1])
             );
 #else
             return vec2(sqrt(_v[0]), sqrt(_v[1]));
@@ -249,7 +249,7 @@ namespace cpm {
             return
                 vec2(
                     __fadd_rz(v1._v[0], v2._v[0]),
-                    __fadd_rz(v1._v[1], v2._v[1]),
+                    __fadd_rz(v1._v[1], v2._v[1])
                 );
 #else
             return vec2(v1._v[0] + v2._v[0], v1._v[1] + v2._v[1]);
@@ -261,7 +261,7 @@ namespace cpm {
             return
                 vec2(
                     __fsub_rz(v1._v[0], v2._v[0]),
-                    __fsub_rz(v1._v[1], v2._v[1]),
+                    __fsub_rz(v1._v[1], v2._v[1])
                 );
 #else
             return vec2(v1._v[0] - v2._v[0], v1._v[1] - v2._v[1]);
@@ -273,7 +273,7 @@ namespace cpm {
             return
                 vec2(
                     __fmul_rz(v1._v[0], v2._v[0]),
-                    __fmul_rz(v1._v[1], v2._v[1]),
+                    __fmul_rz(v1._v[1], v2._v[1])
                 );
 #else
             return vec2(v1._v[0] * v2._v[0], v1._v[1] * v2._v[1]);
@@ -297,7 +297,7 @@ namespace cpm {
             return
                 vec2(
                     __fmul_rz(v._v[0], t),
-                    __fmul_rz(v._v[1], t),
+                    __fmul_rz(v._v[1], t)
                 );
 #else
             return vec2(t * v._v[0], t * v._v[1]);
@@ -309,7 +309,7 @@ namespace cpm {
             return
                 vec2(
                     __fmul_rz(v._v[0], t),
-                    __fmul_rz(v._v[1], t),
+                    __fmul_rz(v._v[1], t)
                 );
 #else
             return vec2(t * v._v[0], t * v._v[1]);
@@ -321,7 +321,7 @@ namespace cpm {
             return
                 vec2(
                     __fdiv_rz(v._v[0], t),
-                    __fdiv_rz(v._v[1], t),
+                    __fdiv_rz(v._v[1], t)
                 );
 #else
             return vec2(v._v[0] / t, v._v[1] / t);
@@ -333,7 +333,7 @@ namespace cpm {
             return
                 vec2(
                     __saturatef(_v[0]),
-                    __saturatef(_v[1]),
+                    __saturatef(_v[1])
                 );
 #else
             return vec2(-1.f, -1.f);

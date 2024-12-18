@@ -1,6 +1,7 @@
 #pragma once
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
+#include "CudaUtils.cuh"
 #include "thrust/host_vector.h"
 #include "Stack.cuh"
 #include "Printers.h"
@@ -9,9 +10,7 @@
 #include "Tree.cuh"
 #include "Ray.cuh"
 
-#define checkCudaErrors(val) check_cuda( (val), #val, __FILE__, __LINE__ )
 
-void check_cuda(cudaError_t result, char const* const func, const char* const file, int const line);
 
 namespace ctest {
 	void PQTest();
@@ -21,6 +20,8 @@ namespace ctest {
 	void PhotonMapInsertTest();
 	void PhotonMapGetClosestTest();
 	void RayTracingTest();
+
+	void TestAll();
 
 	template<typename T>
 	void is_matched(size_t size, T* expected, T* res, bool* out) {

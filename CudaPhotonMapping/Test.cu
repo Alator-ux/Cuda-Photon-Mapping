@@ -17,3 +17,13 @@ void check_cuda(cudaError_t result, char const* const func, const char* const fi
 		exit(99);
 	}
 }
+
+void ctest::TestAll() {
+	ctest::PQTest();
+	ctest::StackTest();
+	ctest::PhotonTest();
+	ctest::TreeTest();
+	ctest::PhotonMapInsertTest();
+	ctest::PhotonMapGetClosestTest();
+	ctest::RayTracingTest();
+}

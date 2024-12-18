@@ -35,8 +35,23 @@
     <CudaCompile Include="Ray.cu">
       <Filter>DataStructures\Ray</Filter>
     </CudaCompile>
+    <CudaCompile Include="Drawer.cu">
+      <Filter>Render</Filter>
+    </CudaCompile>
+    <CudaCompile Include="CudaRandom.cu">
+      <Filter>Tools\CudaRandom</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Model.cu">
+      <Filter>Model</Filter>
+    </CudaCompile>
+    <CudaCompile Include="RandomTest.cu">
+      <Filter>Tests</Filter>
+    </CudaCompile>
     <CudaCompile Include="vec3_funcs.cu">
       <Filter>Tools\vec3_funcs</Filter>
+    </CudaCompile>
+    <CudaCompile Include="CudaOpenGLUtils.cu">
+      <Filter>Tools\CudaOpenGLUtils</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>
@@ -48,9 +63,6 @@
     </ClInclude>
     <ClInclude Include="Test.cuh">
       <Filter>Tests</Filter>
-    </ClInclude>
-    <ClInclude Include="vec3.cuh">
-      <Filter>DataStructures</Filter>
     </ClInclude>
     <ClInclude Include="Tree.cuh">
       <Filter>DataStructures</Filter>
@@ -88,7 +100,69 @@
     <ClInclude Include="vec3_funcs.cuh">
       <Filter>Tools\vec3_funcs</Filter>
     </ClInclude>
-    <ClInclude Include="ObjLoader.h" />
+    <ClInclude Include="ObjLoader.h">
+      <Filter>Loaders\ModelLoader</Filter>
+    </ClInclude>
+    <ClInclude Include="vec3.cuh">
+      <Filter>DataStructures\vec</Filter>
+    </ClInclude>
+    <ClInclude Include="vec2.cuh">
+      <Filter>DataStructures\vec</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.cuh">
+      <Filter>Model\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="CudaUtils.cuh">
+      <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Drawer.cuh">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.cuh">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Tuple3.h">
+      <Filter>DataStructures</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.cuh">
+      <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.cuh">
+      <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelConstructInfo.cuh">
+      <Filter>Model\ModelConstructionInfo</Filter>
+    </ClInclude>
+    <ClInclude Include="CudaRandom.cuh">
+      <Filter>Tools\CudaRandom</Filter>
+    </ClInclude>
+    <ClInclude Include="Printer.cuh">
+      <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Raytracer.cuh">
+      <Filter>Tracing</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.cuh">
+      <Filter>Tracing</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.cuh">
+      <Filter>Tracing</Filter>
+    </ClInclude>
+    <ClInclude Include="MediumManager.cuh">
+      <Filter>DataStructures</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenglLayer.h">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="CudaOpenGLUtils.cuh">
+      <Filter>Tools\CudaOpenGLUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderEnums.cuh">
+      <Filter>Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.cuh">
+      <Filter>Tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Tests">
@@ -115,11 +189,46 @@
     <Filter Include="Loaders\ModelLoader">
       <UniqueIdentifier>{9f284c92-7a1e-46e5-bc43-5dee900c4efb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DataStructures\vec">
+      <UniqueIdentifier>{c49c3e84-c605-4e95-b823-331834426308}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Render">
+      <UniqueIdentifier>{e79aa1e3-36a4-44d2-a919-4551e39d3b46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Model">
+      <UniqueIdentifier>{6a5277e5-2c80-4824-96fd-2300fd6c7eda}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tools\CudaRandom">
+      <UniqueIdentifier>{fe7c0008-9203-4d55-8a22-7d257f31e9ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Model\Material">
+      <UniqueIdentifier>{1c6dca62-e4d6-4edf-accd-14428d2f0e04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Model\ModelConstructionInfo">
+      <UniqueIdentifier>{d9c17a93-3927-4529-8193-4408468fb7a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tracing">
+      <UniqueIdentifier>{c07e6fca-46b7-478d-8a59-06ea9a921954}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Render\OpenglLayer">
+      <UniqueIdentifier>{e34930ab-8e2a-43f3-b7b4-a51d64c873cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tools\CudaOpenGLUtils">
+      <UniqueIdentifier>{7d5ee711-e3b2-46ff-8268-b90a7c4f308e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Printers.cpp">
       <Filter>Tools</Filter>
     </ClCompile>
-    <ClCompile Include="ObjLoader.cpp" />
+    <ClCompile Include="ObjLoader.cpp">
+      <Filter>Loaders\ModelLoader</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelConstructInfo.cu">
+      <Filter>Model\ModelConstructionInfo</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenglLayer.cpp">
+      <Filter>Render\OpenglLayer</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

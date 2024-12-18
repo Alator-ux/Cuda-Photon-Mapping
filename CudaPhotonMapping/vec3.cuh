@@ -9,6 +9,10 @@
  * of plain computations.
  */
 
+namespace {
+    constexpr float eps = 0.001f;
+}
+
 #ifdef __CUDA_ARCH__
 #define USE_INTRINSICS
 #endif
@@ -380,6 +384,16 @@ namespace cpm {
 
         __host__ __device__ inline bool operator==(vec3& other) const {
             return x() == other.x() && y() == other.y() && z() && other.z();
+        }
+        __host__ __device__ inline bool is_zero() const {
+            return _v[0] == 0.f && _v[1] == 0.f && _v[2] == 0.f;
+        }
+        __host__ __device__ inline bool equal(const cpm::vec3& other) {
+            bool res = true;
+            res = res && fabs(this->x() - other.x()) < eps;
+            res = res && fabs(this->y() - other.y()) < eps;
+            res = res && fabs(this->z() - other.z()) < eps;
+            return res;
         }
     private:
         float _v[3];

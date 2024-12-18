@@ -77,15 +77,23 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;WIN64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Linking\include\imgui;$(SolutionDir)\Linking\include;$(SolutionDir)\Linking\include\CImg;%(AdditionalIncludeDirectories);$(CudaToolkitIncludeDir)</AdditionalIncludeDirectories>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>cudart_static.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;opengl32.lib;glfw\glfw3.lib;glfw\glfw3dll.lib;glew\glew32.lib;GnuWin32\jpeg.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\Linking\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
+      <GPUDebugInfo>true</GPUDebugInfo>
+      <PtxAsOptionV>true</PtxAsOptionV>
+      <GenerateRelocatableDeviceCode>false</GenerateRelocatableDeviceCode>
+      <ExtensibleWholeProgramCompilation>false</ExtensibleWholeProgramCompilation>
     </CudaCompile>
+    <CudaLink />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -109,18 +117,20 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;WIN64;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Linking\include\thrust;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Linking\include\thrust;$(SolutionDir)\Linking\include\imgui;$(SolutionDir)\Linking\include\;$(SolutionDir)\Linking\include\CImg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>cudart_static.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>cudart_static.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;opengl32.lib;glfw\glfw3.lib;glfw\glfw3dll.lib;glew\glew32.lib;GnuWin32\jpeg.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>LIBCMT</IgnoreSpecificDefaultLibraries>
+      <AdditionalLibraryDirectories>$(SolutionDir)\Linking\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
+      <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -143,13 +153,18 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <CudaCompile Include="CudaOpenGLUtils.cu" />
+    <CudaCompile Include="CudaRandom.cu" />
+    <CudaCompile Include="Drawer.cu" />
     <CudaCompile Include="math_functions.cuh" />
+    <CudaCompile Include="Model.cu" />
     <CudaCompile Include="PhotonMap.cu" />
     <CudaCompile Include="PhotonMapGetClosestTest.cu" />
     <CudaCompile Include="PhotonMapInsertTest.cu" />
     <CudaCompile Include="PhotonTest.cu" />
     <CudaCompile Include="PriorityQueueTest.cu" />
     <CudaCompile Include="kernel.cu" />
+    <CudaCompile Include="RandomTest.cu" />
     <CudaCompile Include="Ray.cu" />
     <CudaCompile Include="RayTraycingTest.cu" />
     <CudaCompile Include="StackTest.cu" />
@@ -159,25 +174,46 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArrayTools.cuh" />
+    <ClInclude Include="Camera.cuh" />
+    <ClInclude Include="CudaOpenGLUtils.cuh" />
+    <ClInclude Include="CudaRandom.cuh" />
+    <ClInclude Include="CudaUtils.cuh" />
     <ClInclude Include="DeepLookStack.cuh" />
     <ClInclude Include="FourTuple.cuh" />
+    <ClInclude Include="MediumManager.cuh" />
+    <ClInclude Include="Light.cuh" />
+    <ClInclude Include="Material.cuh" />
+    <ClInclude Include="Model.cuh" />
+    <ClInclude Include="ModelConstructInfo.cuh" />
     <ClInclude Include="ObjLoader.h" />
+    <ClInclude Include="OpenglLayer.h" />
     <ClInclude Include="Pair.cuh" />
     <ClInclude Include="Photon.cuh" />
     <ClInclude Include="PhotonMap.cuh" />
+    <ClInclude Include="Printer.cuh" />
     <ClInclude Include="Printers.h" />
     <ClInclude Include="PriorityQueue.cuh" />
     <ClInclude Include="Ray.cuh" />
+    <ClInclude Include="Drawer.cuh" />
+    <ClInclude Include="Raytracer.cuh" />
+    <ClInclude Include="RenderEnums.cuh" />
+    <ClInclude Include="Scene.cuh" />
     <ClInclude Include="Sort.cuh" />
     <ClInclude Include="Test.cuh" />
     <ClInclude Include="Stack.cuh" />
     <ClInclude Include="TestablePhotonMap.cuh" />
+    <ClInclude Include="Timer.cuh" />
     <ClInclude Include="Tree.cuh" />
+    <ClInclude Include="Tuple3.h" />
+    <ClInclude Include="vec2.cuh" />
     <ClInclude Include="vec3.cuh" />
     <ClInclude Include="vec3_funcs.cuh" />
+    <ClInclude Include="Window.cuh" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ModelConstructInfo.cu" />
     <ClCompile Include="ObjLoader.cpp" />
+    <ClCompile Include="OpenglLayer.cpp" />
     <ClCompile Include="Printers.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
