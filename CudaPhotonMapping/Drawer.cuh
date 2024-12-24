@@ -22,14 +22,21 @@ class Drawer {
 
 public:
 	Drawer() : gpu_canvas(nullptr), cpu_canvas(nullptr), cuda_resource(nullptr), width(0), height(0) {}
+	Drawer(const Drawer& other) : 
+		cuda_resource(other.cuda_resource), width(other.width), height(other.height), render_mode(other.render_mode),
+		gpu_canvas(other.gpu_canvas), cpu_canvas(other.cpu_canvas),
+		cpu_raytracer(other.cpu_raytracer), gpu_raytracer(other.gpu_raytracer),
+		timer() {}
 	Drawer(cudaGraphicsResource* cuda_resource, int width, int height, RenderMode render_mode = RenderMode::gpu)
 		: cuda_resource(cuda_resource), width(width), height(height), render_mode(render_mode),
 		gpu_canvas(nullptr), cpu_canvas((uchar3*)malloc(width * height * sizeof(uchar3))),
-		cpu_raytracer((Raytracer*)malloc(sizeof(Raytracer)))
+		cpu_raytracer((Raytracer*)malloc(sizeof(Raytracer))),
+		timer()
 	{
-		Timer timer = Timer();
 		cudaMalloc(&gpu_raytracer, sizeof(Raytracer));
 	}
+
+	Drawer& operator=(const Drawer& other);
 
 	void Draw(int frame);
 	void change_render_mode();

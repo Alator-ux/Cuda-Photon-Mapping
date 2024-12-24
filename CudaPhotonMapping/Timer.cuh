@@ -10,15 +10,31 @@ class Timer {
 
     cudaEvent_t cuda_start;
     cudaEvent_t cuda_stop;
+
+    float average_cuda_time;
+    size_t cuda_count;
 public:
     Timer() : start_time_cpu(), stop_time_cpu(), cuda_start(nullptr), cuda_stop(nullptr) {
-        // Инициализация CUDA событий
-        cudaEventCreate(&cuda_start);
-        cudaEventCreate(&cuda_stop);
+        cudaError_t err;
+
+        err = cudaEventCreate(&cuda_start);
+        if (err != cudaSuccess) {
+            std::cerr << "Failed to create start event: " << cudaGetErrorString(err) << std::endl;
+            exit(-1);
+        }
+        err = cudaEventCreate(&cuda_stop);
+        if (err != cudaSuccess) {
+            std::cerr << "Failed to create start event: " << cudaGetErrorString(err) << std::endl;
+            exit(-1);
+        }
+
+        resetAverageCUDA();
     }
 
+    Timer(const Timer&) = delete;
+    Timer& operator=(const Timer&) = delete;
+
     ~Timer() {
-        // Уничтожение CUDA событий
         cudaEventDestroy(cuda_start);
         cudaEventDestroy(cuda_stop);
     }
@@ -48,6 +64,13 @@ public:
     void stopCUDA() {
         cudaEventRecord(cuda_stop, 0);
         cudaEventSynchronize(cuda_stop);
+        average_cuda_time += elapsedCUDA();
+        cuda_count += 1;
+    }
+
+    void resetAverageCUDA() {
+        cuda_count = 0;
+        average_cuda_time = 0;
     }
 
     // Вычисление прошедшего времени для CUDA в миллисекундах
@@ -64,5 +87,9 @@ public:
 
     void printCUDA(const std::string& label = "CUDA") const {
         std::cout << label << " Time: " << elapsedCUDA() << " ms" << std::endl;
+    }
+
+    float printAverageCUDA(const std::string& label = "CUDA Average") const {
+        std::cout << label << " Time: " << average_cuda_time << " ms" << std::endl;
     }
 };

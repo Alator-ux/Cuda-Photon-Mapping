@@ -26,11 +26,12 @@ void Drawer::draw_in_gpu(int frame) {
 	dim3 block(16, 16);
 	dim3 grid((width + block.x - 1) / block.x, (height + block.y - 1) / block.y);
 	//compute << <grid, block >> > (gpu_canvas, width, height, frame);
-	timer.startCPU();
+	timer.startCUDA();
 	gpu_kernel << <grid, block >> > (gpu_canvas, gpu_raytracer, width, height);
-	checkCudaErrors(cudaDeviceSynchronize());
-	timer.stopCPU();
-	timer.printCPU();
+	timer.stopCUDA();
+	timer.printCUDA();
+	/*checkCudaErrors(cudaDeviceSynchronize());*/
+	checkCudaErrors(cudaGetLastError());
 	cudaGraphicsUnmapResources(1, &cuda_resource, 0);
 }
 
@@ -75,4 +76,20 @@ RenderMode Drawer::get_render_mode() {
 
 uchar3* Drawer::get_cpu_canvas() {
 	return cpu_canvas;
+}
+
+Drawer& Drawer::operator=(const Drawer& other) {
+	if (this == &other) {
+		return (*this);
+	}
+	// TODO free resources?
+	this->cuda_resource = other.cuda_resource;
+	this->width = other.width;
+	this->height = other.height;
+	this->render_mode = other.render_mode;
+	this->gpu_canvas = other.gpu_canvas;
+	this->cpu_canvas = other.cpu_canvas;
+	this->cpu_raytracer = other.cpu_raytracer;
+	this->gpu_raytracer = other.gpu_raytracer;
+	return (*this);
 }

@@ -115,8 +115,11 @@ class Raytracer {
 
         cpm::vec3 dir = scene.camera.generate_ray_direction(x, y);
         cpm::Ray ray(origin, dir);
-        cpm::vec3 pixel_color = render_trace(ray, false, 0);
-        canvas[x + y * width] = make_uchar3(pixel_color.x() * 255, pixel_color.y() * 255, pixel_color.z() * 255);
+        //cpm::vec3 pixel_color = render_trace(ray, false, 0);
+        cpm::vec3 t1, t2;
+        Model* m1;
+        find_intersection(ray, false, m1, t1, t2);
+        //canvas[x + y * width] = make_uchar3(pixel_color.x() * 255, pixel_color.y() * 255, pixel_color.z() * 255);
     }
 
     void render_cpu(uchar3* canvas) {

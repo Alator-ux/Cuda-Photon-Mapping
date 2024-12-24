@@ -59,7 +59,7 @@ class Window {
 
 		create_pbo(&this->pbo, &this->cuda_resource, size_bytes, cudaGraphicsMapFlagsWriteDiscard);
 
-		drawer = Drawer(cuda_resource, width, height);
+		drawer = Drawer(cuda_resource, width, height, render_mode);
 	}
 
 	void initialize_opengl_part() {
@@ -117,13 +117,14 @@ public:
 		this->height = height;
 		this->title = title;
 
+		render_mode = RenderMode::gpu;
+
 		initialize_glfw_window();
 		initialize_cuda_part();
 		initialize_opengl_part();
 		checkOpenGLErrors();
 
-		render_mode = RenderMode::gpu;
-		/*drawer.set_render_mode(render_mode);*/
+		
 	}
 
 	void Update(){
