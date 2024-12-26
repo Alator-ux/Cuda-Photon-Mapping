@@ -89,7 +89,7 @@ public:
         std::cout << label << " Time: " << elapsedCUDA() << " ms" << std::endl;
     }
 
-    float printAverageCUDA(const std::string& label = "CUDA Average") const {
-        std::cout << label << " Time: " << average_cuda_time << " ms" << std::endl;
+    void printAverageCUDA(const std::string& label = "CUDA Average") const {
+        std::cout << label << " Time: " << average_cuda_time / cuda_count << " ms" << std::endl;
     }
 };

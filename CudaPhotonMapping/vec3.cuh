@@ -228,7 +228,7 @@ namespace cpm {
         }
 
         // dot product
-        __host__ __device__ static constexpr float dot(const vec3& v1, const vec3& v2) {
+        __host__ __device__ __forceinline__ static constexpr float dot(const vec3& v1, const vec3& v2) {
 #ifdef USE_INTRINSICS
             return
                 (
@@ -381,8 +381,42 @@ namespace cpm {
             return vec3(-1.f, -1.f, -1.f);
 #endif
         }
+        __host__ __device__ inline vec3 copy() const {
+            return vec3(_v[0], _v[1], _v[2]);
+        }
+        __host__ __device__ vec3& add(const vec3& other) {
+            _v[0] += other._v[0];
+            _v[1] += other._v[1];
+            _v[2] += other._v[2];
+            return *this;
+        }
+        __host__ __device__ vec3& mult(float t) {
+            _v[0] *= t;
+            _v[1] *= t;
+            _v[2] *= t;
+            return *this;
+        }
+        __host__ __device__ vec3& mult(const vec3& other) {
+            _v[0] *= other._v[0];
+            _v[1] *= other._v[1];
+            _v[2] *= other._v[2];
+            return *this;
+        }
+        __host__ __device__ vec3& sub(const vec3& other) {
+            _v[0] -= other._v[0];
+            _v[1] -= other._v[1];
+            _v[2] -= other._v[2];
+            return *this;
+        }
+        __host__ __device__ vec3& cross(const vec3& other) {
+            _v[0] = _v[1] * other._v[2] - _v[2] * other._v[1];
+            _v[1] = _v[0] * other._v[2] - _v[2] * other._v[0];
+            _v[2] = _v[0] * other._v[1] - _v[1] * other._v[0];
 
-        __host__ __device__ inline bool operator==(vec3& other) const {
+            return *this;
+        }
+
+        __host__ __device__ inline bool operator==(const vec3& other) const {
             return x() == other.x() && y() == other.y() && z() && other.z();
         }
         __host__ __device__ inline bool is_zero() const {

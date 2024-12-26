@@ -66,12 +66,16 @@ struct Camera {
     __host__ __device__ cpm::vec3 generate_ray_direction(int pixel_x, int pixel_y) const { // TODO вычислить заранее для cuda
         float u = ((float)(pixel_x) + 0.5f) / canvas_width;
         float v = ((float)(pixel_y) + 0.5f) / canvas_height;
-
+        
+        /*cpm::vec3 horizontal = right * viewport_width;
+        cpm::vec3 vertical = up * viewport_height;
+        cpm::vec3 lower_left_corner = position + forward * focal_length - horizontal * 0.5f - vertical * 0.5f;*/
         cpm::vec3 horizontal = right * viewport_width;
         cpm::vec3 vertical = up * viewport_height;
-        cpm::vec3 lower_left_corner = position + forward * focal_length - horizontal * 0.5f - vertical * 0.5f;
+        cpm::vec3 lower_left_corner = position.copy().add(forward).mult(focal_length)
+            .sub(horizontal.copy().mult(0.5f)).sub(vertical.copy().mult(0.5f));
 
-        return cpm::vec3::normalize(lower_left_corner + horizontal * u + vertical * v - position);
+        return cpm::vec3::normalize(lower_left_corner.add(horizontal.mult(u)).add(vertical.mult(v)).sub(position));
     }
 
     __host__ void move(const cpm::vec3& direction, float amount) {

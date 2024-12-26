@@ -106,7 +106,6 @@ cpm::pair<Scene*, Scene*> initialize_scene(const std::string& path, const std::s
 
 int main(int argc, char * argv[]) {
     setlocale(LC_ALL, "");
-
     /*int width  = 1024;
     int height = 768;*/
     /*int width = 2560;

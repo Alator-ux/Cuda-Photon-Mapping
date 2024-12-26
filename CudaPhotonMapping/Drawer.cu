@@ -11,10 +11,6 @@ __global__ void compute(uchar3* canvas, int width, int height, int frame) {
 }
 
 __global__ void gpu_kernel(uchar3* canvas, Raytracer* raytracer, int width, int height) {
-	int x = blockIdx.x * blockDim.x + threadIdx.x;
-	int y = blockIdx.y * blockDim.y + threadIdx.y;
-	if (x >= width || y >= height) return;
-
 	raytracer->render_gpu(canvas, width, height);
 }
 
@@ -23,14 +19,18 @@ void Drawer::draw_in_gpu(int frame) {
 	checkCudaErrors(cudaGraphicsMapResources(1, &cuda_resource, 0));
 	checkCudaErrors(cudaGraphicsResourceGetMappedPointer((void**)&gpu_canvas, &size, cuda_resource));
 
-	dim3 block(16, 16);
+	/*dim3 block(16, 16);
 	dim3 grid((width + block.x - 1) / block.x, (height + block.y - 1) / block.y);
+	int shared_memory = block.x * block.y * sizeof(Raytracer::IntersectionInfo);*/
+
+	int block = 256;
+	int grid = (width * height + block - 1) / block;
+	int shared_memory = block * sizeof(Raytracer::IntersectionInfo);
 	//compute << <grid, block >> > (gpu_canvas, width, height, frame);
 	timer.startCUDA();
-	gpu_kernel << <grid, block >> > (gpu_canvas, gpu_raytracer, width, height);
+	gpu_kernel << <grid, block, shared_memory >> > (gpu_canvas, gpu_raytracer, width, height);
 	timer.stopCUDA();
-	timer.printCUDA();
-	/*checkCudaErrors(cudaDeviceSynchronize());*/
+	timer.printAverageCUDA();
 	checkCudaErrors(cudaGetLastError());
 	cudaGraphicsUnmapResources(1, &cuda_resource, 0);
 }
