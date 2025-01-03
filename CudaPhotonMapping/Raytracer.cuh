@@ -248,10 +248,16 @@ private:
 
         cpm::vec3 p1 = scene.models->mci.positions[0];
         cpm::vec3 p2 = scene.models->mci.positions[0];
-        /*Model* m;
+        Model* m;
         cpm::vec3 t1, t2;
-        find_intersection(ray, false, m, t1,t2);*/
-        float outf;
+        bool res = find_intersection(ray, false, m, t1,t2);
+        if (res) {
+            canvas[id] = make_uchar3(255, 255, 255);
+        }
+        else {
+            canvas[id] = make_uchar3(0, 0, 0);
+        }
+        /*float outf;
         cpm::vec3 outv;
         for (int i = 0; i < 2188; i++) {
             bool res = traingle_intersection(ray, p1, p2, p1, outf, outv);
@@ -261,7 +267,7 @@ private:
             else {
                 canvas[id] = make_uchar3(0, 0, 0);
             }
-        }
+        }*/
 
         //find_intersection(ray, false, intersection_infos + local_id);
         /*cpm::vec3 pixel_color = render_trace(ray, false, 0);

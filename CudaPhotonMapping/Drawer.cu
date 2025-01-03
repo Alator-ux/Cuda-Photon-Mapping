@@ -32,7 +32,7 @@ void Drawer::draw_in_gpu(int frame) {
 	//compute << <grid, block >> > (gpu_canvas, width, height, frame);
 	gpu_kernel << <grid, block, shared_memory >> > (gpu_canvas, gpu_raytracer, width, height);
 	timer.stopCUDA();
-	timer.printAverageCUDA();
+	timer.printCUDA();
 	checkCudaErrors(cudaGetLastError());
 	cudaGraphicsUnmapResources(1, &cuda_resource, 0);
 }
