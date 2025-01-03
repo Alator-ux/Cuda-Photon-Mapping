@@ -180,13 +180,13 @@ private:
 
         // check if the ray and plane are parallel.
         float NdotRayDirection = cpm::vec3::dot(N, ray.direction); //! 5 floats
-        //if (fabsf(NdotRayDirection) < model_eps) // almost 0
-        //    return false; // they are parallel so they don't intersect! 
+        if (fabsf(NdotRayDirection) < model_eps) // almost 0
+            return false; // they are parallel so they don't intersect! 
 
         // compute t (equation 3)
         out_ray_parameter = (cpm::vec3::dot(N, v0) - cpm::vec3::dot(N, ray.origin)) / NdotRayDirection;//! 5+5+1=11 floats
-        // check if the triangle is behind the ray
-        //if (out_ray_parameter < 0) return false; // the triangle is behind
+         //check if the triangle is behind the ray
+        if (out_ray_parameter < 0) return false; // the triangle is behind
 
         // compute the intersection point using equation 1
         cpm::vec3 P = ray.origin.copy().add(out_ray_parameter).mult(ray.direction); //! 3+3=6 floats
@@ -198,19 +198,19 @@ private:
         cpm::vec3 vp0 = P - v0; //! 3 floats
         // vector perpendicular to triangle's plane
         float w = cpm::vec3::dot(N, edge0.cross(vp0)); //! 9+5=14 floats
-        //if (w < 0) return false; // P is on the right side
+        if (w < 0) return false; // P is on the right side
 
         // edge 2
         cpm::vec3 edge2 = v0 - v2; //! 3 floats
         cpm::vec3 vp2 = P - v2; //! 3 floats
         float v = cpm::vec3::dot(N, edge2.cross(vp2)); //! 9+5=14 floats
-        //if (v < 0) return false; // P is on the right side;
+        if (v < 0) return false; // P is on the right side;
         w /= denom; //! 1 floats
         v /= denom; //! 1 floats
         float u = 1.f - v - w; //! 2 floats
-        /*if (u < 0) {
+        if (u < 0) {
             return false;
-        }*/
+        }
         out_uvw[0] = u;
         out_uvw[1] = v;
         out_uvw[2] = w;
@@ -224,14 +224,18 @@ private:
    public:
   
     __device__ void render_gpu(uchar3* canvas, int width, int height) {
-        extern __shared__ IntersectionInfo intersection_infos[];
+        extern __shared__ int intersection_infos[];
         /*int x = blockIdx.x * blockDim.x + threadIdx.x;
         int y = blockIdx.y * blockDim.y + threadIdx.y;
         int local_id = threadIdx.y * blockDim.x + threadIdx.x;
         if (x >= width || y >= height) return;*/
 
         int id = blockIdx.x * blockDim.x + threadIdx.x;
-        if (id >= width * height) return;
+        if (id >= width * height) {
+            atomicAdd(&intersection_infos[0], 1);
+            printf("total %i", intersection_infos[0]);
+            return;
+        }
         int x = id % width;
         int y = id / width;
         
@@ -250,7 +254,13 @@ private:
         float outf;
         cpm::vec3 outv;
         for (int i = 0; i < 2188; i++) {
-            traingle_intersection(ray, p1, p2, p1, outf, outv);
+            bool res = traingle_intersection(ray, p1, p2, p1, outf, outv);
+            if (res) {
+                canvas[id] = make_uchar3(255, 255 ,255);
+            }
+            else {
+                canvas[id] = make_uchar3(0, 0, 0);
+            }
         }
 
         //find_intersection(ray, false, intersection_infos + local_id);

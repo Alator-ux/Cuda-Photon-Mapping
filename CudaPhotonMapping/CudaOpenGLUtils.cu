@@ -3,7 +3,7 @@
 void create_pbo(GLuint* pbo, cudaGraphicsResource** cgr, unsigned int size_bytes, unsigned int flags) {
 	glGenBuffers(1, pbo);
 	glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, *pbo);
-	glBufferData(GL_PIXEL_UNPACK_BUFFER_ARB, size_bytes, NULL, GL_DYNAMIC_DRAW); // GL_STREAM_DRAW
+	glBufferData(GL_PIXEL_UNPACK_BUFFER_ARB, size_bytes, NULL, GL_STREAM_DRAW); // GL_STREAM_DRAW
 
 	checkCudaErrors(cudaGraphicsGLRegisterBuffer(cgr, *pbo, flags));
 }

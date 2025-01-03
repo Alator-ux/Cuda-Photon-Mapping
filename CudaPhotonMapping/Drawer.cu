@@ -1,13 +1,15 @@
 #include "Drawer.cuh"
 
 __global__ void compute(uchar3* canvas, int width, int height, int frame) {
-	int x = blockIdx.x * blockDim.x + threadIdx.x;
+	/*int x = blockIdx.x * blockDim.x + threadIdx.x;
 	int y = blockIdx.y * blockDim.y + threadIdx.y;
-	if (x >= width || y >= height) return;
+	if (x >= width || y >= height) return;*/
+	int id = blockIdx.x * blockDim.x + threadIdx.x;
+	if (id >= width * height) return;
+	int x = id % width;
+	int y = id / width;
 
-	int index = y * width + x;
-	//canvas[index] = make_uchar4((x + frame) % 256, (y + frame) % 256, 128, 255);
-	canvas[index] = make_uchar3((x + frame) % 256, (y + frame) % 256, 128);
+	canvas[id] = make_uchar3((x + frame) % 256, (y + frame) % 256, 128);
 }
 
 __global__ void gpu_kernel(uchar3* canvas, Raytracer* raytracer, int width, int height) {
@@ -26,8 +28,8 @@ void Drawer::draw_in_gpu(int frame) {
 	int block = 256;
 	int grid = (width * height + block - 1) / block;
 	int shared_memory = block * sizeof(Raytracer::IntersectionInfo);
-	//compute << <grid, block >> > (gpu_canvas, width, height, frame);
 	timer.startCUDA();
+	//compute << <grid, block >> > (gpu_canvas, width, height, frame);
 	gpu_kernel << <grid, block, shared_memory >> > (gpu_canvas, gpu_raytracer, width, height);
 	timer.stopCUDA();
 	timer.printAverageCUDA();
