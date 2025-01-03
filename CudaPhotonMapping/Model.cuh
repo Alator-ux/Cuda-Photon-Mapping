@@ -58,60 +58,6 @@ public:
         return result;
     }
 
-    //__host__ __device__ bool traingle_intersection(const cpm::Ray& ray, bool in_object,
-    //    const cpm::vec3& v0, const cpm::vec3& v1, const cpm::vec3& v2,
-    //    float& out_ray_parameter, cpm::vec3& out_uvw) const {
-    //    out_ray_parameter = 0.f;
-    //    // compute the plane's normal
-    //    cpm::vec3 v0v1 = v1 - v0;
-    //    cpm::vec3 v0v2 = v2 - v0;
-    //    // no need to normalize
-    //    cpm::vec3 N = cpm::vec3::cross(v0v1, v0v2); // Normal of the triangle plane
-    //    float denom = cpm::vec3::dot(N, N);
-
-    //    // Step 1: finding P
-
-    //    // check if the ray and plane are parallel.
-    //    float NdotRayDirection = cpm::vec3::dot(N, ray.direction);
-    //    if (fabsf(NdotRayDirection) < model_eps) // almost 0
-    //        return false; // they are parallel so they don't intersect! 
-
-    //    // compute t (equation 3)
-    //    out_ray_parameter = (cpm::vec3::dot(N, v0) - cpm::vec3::dot(N, ray.origin)) / NdotRayDirection;
-    //    // check if the triangle is behind the ray
-    //    if (out_ray_parameter < 0) return false; // the triangle is behind
-
-    //    // compute the intersection point using equation 1
-    //    cpm::vec3 P = ray.origin + out_ray_parameter * ray.direction;
-
-    //    // Step 2: inside-outside test
-    //    cpm::vec3 C; // vector perpendicular to triangle's plane
-
-    //    // edge 0
-    //    cpm::vec3 edge0 = v1 - v0;
-    //    cpm::vec3 vp0 = P - v0;
-    //    C = cpm::vec3::cross(edge0, vp0);
-    //    float w = cpm::vec3::dot(N, C);
-    //    if (w < 0) return false; // P is on the right side
-
-    //    // edge 2
-    //    cpm::vec3 edge2 = v0 - v2;
-    //    cpm::vec3 vp2 = P - v2;
-    //    C = cpm::vec3::cross(edge2, vp2);
-    //    float v = cpm::vec3::dot(N, C);
-    //    if (v < 0) return false; // P is on the right side;
-    //    w /= denom;
-    //    v /= denom;
-    //    float u = 1.f - v - w;
-    //    if (u < 0) {
-    //        return false;
-    //    }
-    //    out_uvw[0] = u;
-    //    out_uvw[1] = v;
-    //    out_uvw[2] = w;
-    //    return true; // this ray hits the triangle
-    //}
-
     __host__ __device__ bool traingle_intersection(const cpm::Ray& ray, bool in_object,
         const cpm::vec3& v0, const cpm::vec3& v1, const cpm::vec3& v2,
         float& out_ray_parameter, cpm::vec3& out_uvw) const {
@@ -136,21 +82,23 @@ public:
         if (out_ray_parameter < 0) return false; // the triangle is behind
 
         // compute the intersection point using equation 1
-        cpm::vec3 P = ray.origin.copy().add(out_ray_parameter).mult(ray.direction);
+        cpm::vec3 P = ray.origin + out_ray_parameter * ray.direction;
 
         // Step 2: inside-outside test
+        cpm::vec3 C; // vector perpendicular to triangle's plane
 
         // edge 0
         cpm::vec3 edge0 = v1 - v0;
         cpm::vec3 vp0 = P - v0;
-        // vector perpendicular to triangle's plane
-        float w = cpm::vec3::dot(N, edge0.cross(vp0));
+        C = cpm::vec3::cross(edge0, vp0);
+        float w = cpm::vec3::dot(N, C);
         if (w < 0) return false; // P is on the right side
 
         // edge 2
         cpm::vec3 edge2 = v0 - v2;
         cpm::vec3 vp2 = P - v2;
-        float v = cpm::vec3::dot(N, edge2.cross(vp2));
+        C = cpm::vec3::cross(edge2, vp2);
+        float v = cpm::vec3::dot(N, C);
         if (v < 0) return false; // P is on the right side;
         w /= denom;
         v /= denom;
@@ -163,6 +111,58 @@ public:
         out_uvw.z = w;
         return true; // this ray hits the triangle
     }
+
+    //__host__ __device__ bool traingle_intersection(const cpm::Ray& ray, bool in_object,
+    //    const cpm::vec3& v0, const cpm::vec3& v1, const cpm::vec3& v2,
+    //    float& out_ray_parameter, cpm::vec3& out_uvw) const {
+    //    out_ray_parameter = 0.f;
+    //    // compute the plane's normal
+    //    cpm::vec3 v0v1 = v1 - v0;
+    //    cpm::vec3 v0v2 = v2 - v0;
+    //    // no need to normalize
+    //    cpm::vec3 N = cpm::vec3::cross(v0v1, v0v2); // Normal of the triangle plane
+    //    float denom = cpm::vec3::dot(N, N);
+
+    //    // Step 1: finding P
+
+    //    // check if the ray and plane are parallel.
+    //    float NdotRayDirection = cpm::vec3::dot(N, ray.direction);
+    //    if (fabsf(NdotRayDirection) < model_eps) // almost 0
+    //        return false; // they are parallel so they don't intersect! 
+
+    //    // compute t (equation 3)
+    //    out_ray_parameter = (cpm::vec3::dot(N, v0) - cpm::vec3::dot(N, ray.origin)) / NdotRayDirection;
+    //    // check if the triangle is behind the ray
+    //    if (out_ray_parameter < 0) return false; // the triangle is behind
+
+    //    // compute the intersection point using equation 1
+    //    cpm::vec3 P = ray.origin.copy().add(out_ray_parameter).mult(ray.direction);
+
+    //    // Step 2: inside-outside test
+
+    //    // edge 0
+    //    cpm::vec3 edge0 = v1 - v0;
+    //    cpm::vec3 vp0 = P - v0;
+    //    // vector perpendicular to triangle's plane
+    //    float w = cpm::vec3::dot(N, edge0.cross(vp0));
+    //    if (w < 0) return false; // P is on the right side
+
+    //    // edge 2
+    //    cpm::vec3 edge2 = v0 - v2;
+    //    cpm::vec3 vp2 = P - v2;
+    //    float v = cpm::vec3::dot(N, edge2.cross(vp2));
+    //    if (v < 0) return false; // P is on the right side;
+    //    w /= denom;
+    //    v /= denom;
+    //    float u = 1.f - v - w;
+    //    if (u < 0) {
+    //        return false;
+    //    }
+    //    out_uvw.x = u;
+    //    out_uvw.y = v;
+    //    out_uvw.z = w;
+    //    return true; // this ray hits the triangle
+    //}
 
 public:
 	__host__ Model(const Model& other) {

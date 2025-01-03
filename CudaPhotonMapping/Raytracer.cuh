@@ -101,52 +101,52 @@ private:
         cpm::Ray current_ray = ray;
         cpm::vec3 accumulated_color(0.f);
         cpm::vec3 coef_after_reflection(1.f);
-        //for (int current_depth = 0; current_depth < max_depth; current_depth++) {
-        //    cpm::vec3 normal, inter_p;
-        //    Model* imodel;
+        for (int current_depth = 0; current_depth < max_depth; current_depth++) {
+            cpm::vec3 normal, inter_p;
+            Model* imodel;
 
-        //    if (!find_intersection(current_ray, in_object, imodel, normal, inter_p)) {
-        //        break;
-        //    }
+            if (!find_intersection(current_ray, in_object, imodel, normal, inter_p)) {
+                break;
+            }
 
-        //    Material mat = *imodel->get_material();
+            Material mat = *imodel->get_material();
 
-        //    if (!mat.diffuse.is_zero()) {
-        //        cpm::vec3 re(0.f);
-        //        int important_ls = 0;
-        //        cpm::vec3 tnormal, tinter_p;
-        //        Model* timodel;
-        //        cpm::Ray tray;
+            if (!mat.diffuse.is_zero()) {
+                cpm::vec3 re(0.f);
+                int important_ls = 0;
+                cpm::vec3 tnormal, tinter_p;
+                Model* timodel;
+                cpm::Ray tray;
 
-        //        int ls_number = scene.light_sources_number;
-        //        LightSource* light_sources = scene.light_sources;
-        //        for (int i = 0; i < ls_number; i++) {
-        //            const LightSource* ls = light_sources + i;
-        //            tray.origin = ls->position;
-        //            tray.direction = cpm::vec3::normalize(inter_p - ls->position); // point <- ls
-        //            tray.origin += tray.direction * 0.001f; 
-        //            if (find_intersection(tray, in_object, timodel, tnormal, tinter_p) && inter_p.equal(tinter_p)) {
-        //                important_ls++;
-        //                re += max(cpm::vec3::dot(normal, -tray.direction), 0.f);
-        //            }
-        //        }
+                int ls_number = scene.light_sources_number;
+                LightSource* light_sources = scene.light_sources;
+                for (int i = 0; i < ls_number; i++) {
+                    const LightSource* ls = light_sources + i;
+                    tray.origin = ls->position;
+                    tray.direction = cpm::vec3::normalize(inter_p - ls->position); // point <- ls
+                    tray.origin += tray.direction * 0.001f; 
+                    if (find_intersection(tray, in_object, timodel, tnormal, tinter_p) && inter_p.equal(tinter_p)) {
+                        important_ls++;
+                        re += max(cpm::vec3::dot(normal, -tray.direction), 0.f);
+                    }
+                }
 
-        //        re /= important_ls == 0 ? 1 : important_ls;
-        //        auto di_op = mat.diffuse * mat.opaque;
+                re /= important_ls == 0 ? 1 : important_ls;
+                auto di_op = mat.diffuse * mat.opaque;
 
-        //        accumulated_color += re * di_op * coef_after_reflection;
-        //    }
+                accumulated_color += re * di_op * coef_after_reflection;
+            }
 
-        //    accumulated_color += mat.emission * coef_after_reflection;
+            accumulated_color += mat.emission * coef_after_reflection;
 
-        //    if (!in_object && !mat.specular.is_zero()) {
-        //        cpm::Ray nray = current_ray.reflect(inter_p, normal);
-        //        float coef = pow(max(cpm::vec3::dot(nray.direction, -current_ray.direction), 0.0f), mat.shininess);
-        //     
-        //        coef_after_reflection *= mat.specular * mat.opaque * coef;
-        //        current_ray = nray;
-        //    }
-        //}
+            if (!in_object && !mat.specular.is_zero()) {
+                cpm::Ray nray = current_ray.reflect(inter_p, normal);
+                float coef = pow(max(cpm::vec3::dot(nray.direction, -current_ray.direction), 0.0f), mat.shininess);
+             
+                coef_after_reflection *= mat.specular * mat.opaque * coef;
+                current_ray = nray;
+            }
+        }
 
         res = accumulated_color;
         return res;
@@ -246,7 +246,7 @@ private:
         cpm::vec3 dir = scene.camera.generate_ray_direction(x, y);
         cpm::Ray ray(origin, dir);
 
-        cpm::vec3 p1 = scene.models->mci.positions[0];
+        /*cpm::vec3 p1 = scene.models->mci.positions[0];
         cpm::vec3 p2 = scene.models->mci.positions[0];
         Model* m;
         cpm::vec3 t1, t2;
@@ -256,7 +256,8 @@ private:
         }
         else {
             canvas[id] = make_uchar3(0, 0, 0);
-        }
+        }*/
+
         /*float outf;
         cpm::vec3 outv;
         for (int i = 0; i < 2188; i++) {
@@ -270,8 +271,8 @@ private:
         }*/
 
         //find_intersection(ray, false, intersection_infos + local_id);
-        /*cpm::vec3 pixel_color = render_trace(ray, false, 0);
-        canvas[id] = make_uchar3(pixel_color.x() * 255, pixel_color.y() * 255, pixel_color.z() * 255);*/
+        cpm::vec3 pixel_color = render_trace(ray, false, 0);
+        canvas[id] = make_uchar3(pixel_color.x * 255, pixel_color.y * 255, pixel_color.z * 255);
     }
 
     void render_cpu(uchar3* canvas) {
