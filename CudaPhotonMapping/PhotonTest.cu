@@ -1,13 +1,13 @@
 #include "Test.cuh"
 #include "Photon.cuh"
 void __host__ __device__ TestCore(cpm::Photon *photon, float* vres) {
-	vres[0] = photon->pos.x();
-	vres[1] = photon->pos.y();
-	vres[2] = photon->pos.z();
+	vres[0] = photon->pos.x;
+	vres[1] = photon->pos.y;
+	vres[2] = photon->pos.z;
 
-	vres[3] = photon->power.r();
-	vres[4] = photon->power.g();
-	vres[5] = photon->power.b();
+	vres[3] = photon->power.x;
+	vres[4] = photon->power.y;
+	vres[5] = photon->power.z;
 
 	vres[6] = photon->inc_dir[0];
 	vres[7] = photon->inc_dir[1];

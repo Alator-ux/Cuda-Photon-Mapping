@@ -20,13 +20,13 @@ void __host__ __device__ TestCore(cpm::Tree<cpm::Photon>* tree, float* vres, boo
 	bres[5] = tree->has_right(right_ind) == false;
 	bres[6] = tree->has_left(10) == false;
 
-	vres[0] = tree->get_root()->pos.x();
-	vres[1] = tree->get_right(0)->pos.x();
-	vres[2] = tree->get_right(right_ind) == nullptr ? -1 : tree->get_right(right_ind)->pos.x();
-	vres[3] = tree->get_left(0)->pos.x();
-	vres[4] = tree->get_right(left_ind)->pos.x();
+	vres[0] = tree->get_root()->pos.x;
+	vres[1] = tree->get_right(0)->pos.x;
+	vres[2] = tree->get_right(right_ind) == nullptr ? -1 : tree->get_right(right_ind)->pos.x;
+	vres[3] = tree->get_left(0)->pos.x;
+	vres[4] = tree->get_right(left_ind)->pos.x;
 	vres[5] = tree->add_right(10, &right);
-	vres[6] = tree->get_left(10) == nullptr ? -1 : tree->get_left(10)->pos.x();
+	vres[6] = tree->get_left(10) == nullptr ? -1 : tree->get_left(10)->pos.x;
 }
 void __global__ TestFromHostToDevice(cpm::Tree<cpm::Photon>* tree, float* vres, bool* bres) {
 	TestCore(tree, vres, bres);

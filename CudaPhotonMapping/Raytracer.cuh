@@ -278,7 +278,7 @@ private:
                 cpm::vec3 dir = scene.camera.generate_ray_direction(i, j);
                 cpm::Ray ray(origin, dir);
                 cpm::vec3 pixel_color = render_trace(ray, false, 0);
-                canvas[i + j * width] = make_uchar3(pixel_color.x() * 255, pixel_color.y() * 255, pixel_color.z() * 255);
+                canvas[i + j * width] = make_uchar3(pixel_color.x * 255, pixel_color.y * 255, pixel_color.z * 255);
             }
             if (j % ((size_t)height / 50) == 0) {
                 std::cout << "\tPixels filled: " << (j + 1) * width << " of " << width * height << std::endl;

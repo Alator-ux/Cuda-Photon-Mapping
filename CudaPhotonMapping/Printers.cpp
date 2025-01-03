@@ -7,5 +7,5 @@ void println_divider() {
 
 void println_vec3(cpm::vec3 vec3)
 {
-	std::cout << "x=" << vec3.x() << " y=" << vec3.y() << " z=" << vec3.z();
+	std::cout << "x=" << vec3.x << " y=" << vec3.y << " z=" << vec3.z;
 }

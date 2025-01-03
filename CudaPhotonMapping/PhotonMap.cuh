@@ -162,9 +162,9 @@ namespace cpm
             size_t largest_plane = 0;
             {
                 cpm::vec3 dims(
-                    fabs(bigp.x() - smallp.x()),
-                    fabs(bigp.y() - smallp.y()),
-                    fabs(bigp.z() - smallp.z())
+                    fabs(bigp.x - smallp.x),
+                    fabs(bigp.y - smallp.y),
+                    fabs(bigp.z - smallp.z)
                 );
                 float max = dims[0];
                 for (size_t i = 1; i < 3; i++) {

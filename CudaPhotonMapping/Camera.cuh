@@ -59,8 +59,8 @@ struct Camera {
         right = cpm::vec3::normalize(cpm::vec3::cross(forward, up_vector));
         up = cpm::vec3::cross(right, forward);
 
-        yaw = atan2(direction.z(), direction.x()) * 180.0f / pi;
-        pitch = asin(direction.y()) * 180.0f / pi;
+        yaw = atan2(direction.z, direction.x) * 180.0f / pi;
+        pitch = asin(direction.y) * 180.0f / pi;
     }
 
     __host__ __device__ cpm::vec3 generate_ray_direction(int pixel_x, int pixel_y) const { // TODO вычислить заранее для cuda

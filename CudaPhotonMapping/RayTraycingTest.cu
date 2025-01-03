@@ -1,7 +1,7 @@
 #include "Test.cuh"
 
 __device__ cpm::vec3 color(const cpm::Ray ray) {
-	float t = 0.5f * (ray.direction.y() + 1.f);
+	float t = 0.5f * (ray.direction.y + 1.f);
 	return (1.0f - t) * cpm::vec3(1.0, 1.0, 1.0) + t * cpm::vec3(0.5, 0.7, 1.0);
 }
 
@@ -25,7 +25,7 @@ void print_frame_buffer(cpm::vec3* frame_buffer, int fb_width, int fb_height) {
 		for (int i = 0; i < fb_width; i++) {
 			size_t pixel_index = j * fb_width + i;
 			cpm::vec3 rgb = frame_buffer[pixel_index];
-			std::cout << rgb.r() << " " << rgb.g() << " " << rgb.b() << "\n";
+			std::cout << rgb.x << " " << rgb.y << " " << rgb.z << "\n";
 		}
 	}
 }

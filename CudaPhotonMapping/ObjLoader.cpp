@@ -349,7 +349,7 @@ void fill_normals(const std::string& path, const std::string& fname) {
             auto v1 = vertex_positions[1] - vertex_positions[0];
             auto v2 = vertex_positions[vertex_positions.size() - 1] - vertex_positions[0];
             auto norm = cpm::vec3::normalize(cpm::vec3::cross(v1, v2));
-            new_file << "vn  " << norm.x() << " " << norm.y() << " " << norm.z() << '\n';
+            new_file << "vn  " << norm.x << " " << norm.y << " " << norm.z << '\n';
             vertex_positions.clear();
             processing_v = false;
         }

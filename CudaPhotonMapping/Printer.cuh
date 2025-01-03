@@ -5,7 +5,7 @@
 struct Printer {
 	__host__ __device__ Printer() {}
 	__host__ __device__ Printer& vec3(const cpm::vec3& vec3) {
-		printf("(%f, %f, %f)", vec3.x(), vec3.y(), vec3.z());
+		printf("(%f, %f, %f)", vec3.x, vec3.y, vec3.z);
 		return *this;
 	}
 	__host__ __device__ Printer& string(const char* str) {

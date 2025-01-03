@@ -53,7 +53,7 @@ public:
 
     __host__ __device__ bool is_st_in_triangle(const cpm::vec2& st, size_t ii0, size_t ii1, size_t ii2, cpm::vec3& out_uvw) const {
         out_uvw = barycentric_coords(st, ii0, ii1, ii2);
-        bool result = out_uvw.x() >= 0.0f && out_uvw.y() >= 0.0f && out_uvw.z() >= 0.0f;
+        bool result = out_uvw.x >= 0.0f && out_uvw.y >= 0.0f && out_uvw.z >= 0.0f;
         out_uvw.normalize();
         return result;
     }
@@ -158,9 +158,9 @@ public:
         if (u < 0) {
             return false;
         }
-        out_uvw[0] = u;
-        out_uvw[1] = v;
-        out_uvw[2] = w;
+        out_uvw.x = u;
+        out_uvw.y = v;
+        out_uvw.z = w;
         return true; // this ray hits the triangle
     }
 
@@ -220,8 +220,8 @@ public:
     __host__ __device__ void get_normal(size_t ii0, size_t ii1, size_t ii2, cpm::vec2& point, cpm::vec3& normal) {
         if (mci.smooth) {
             auto uvw = barycentric_coords(point, ii0, ii1, ii2);
-            auto np = mci.positions[ii0] * uvw.x() +
-                mci.positions[ii1]* uvw.y() + mci.positions[ii2] * uvw.z();
+            auto np = mci.positions[ii0] * uvw.x +
+                mci.positions[ii1]* uvw.y + mci.positions[ii2] * uvw.z;
             normal = cpm::interpolate_uvw(mci.positions[ii0], mci.positions[ii1],
                 mci.positions[ii2], uvw);
             return;
@@ -260,16 +260,16 @@ public:
             printf("Unknown model vertex organization\n");
         }
         cpm::vec3 uvw;
-        uvw[0] = curand_uniform(&local_state);
-        uvw[1] = cpm::fmap_to_range(curand_uniform(&local_state), uvw.x(), 1.f);
-        uvw[2] = 1.f - uvw.x() - uvw.y();
+        uvw.x = curand_uniform(&local_state);
+        uvw.y = cpm::fmap_to_range(curand_uniform(&local_state), uvw.x, 1.f);
+        uvw.z = 1.f - uvw.x - uvw.y;
 
-        cpm::vec3 point = uvw.x() * mci.positions[ind0] +
-            uvw.y() * mci.positions[ind1] +
-            uvw.z() * mci.positions[ind2];
-        cpm::vec3 normal = uvw.x() * mci.normals[ind0] +
-            uvw.y() * mci.normals[ind1] +
-            uvw.z() * mci.normals[ind2];
+        cpm::vec3 point = uvw.x * mci.positions[ind0] +
+            uvw.y * mci.positions[ind1] +
+            uvw.z * mci.positions[ind2];
+        cpm::vec3 normal = uvw.x * mci.normals[ind0] +
+            uvw.y * mci.normals[ind1] +
+            uvw.z * mci.normals[ind2];
 
         *state = local_state;
 
@@ -305,16 +305,16 @@ public:
             printf("Unknown model vertex organization\n");
         }
         cpm::vec3 uvw;
-        uvw[0] = rnd_gen.cpurand_uniform();
-        uvw[1] = rnd_gen.cpurand_uniform_in_range(uvw.x(), 1.f);
-        uvw[2] = 1.f - uvw.x() - uvw.y();
+        uvw.x = rnd_gen.cpurand_uniform();
+        uvw.y = rnd_gen.cpurand_uniform_in_range(uvw.x, 1.f);
+        uvw.z = 1.f - uvw.x - uvw.y;
 
-        cpm::vec3 point = uvw.x() * mci.positions[ind0] +
-            uvw.y() * mci.positions[ind1] +
-            uvw.z() * mci.positions[ind2];
-        cpm::vec3 normal = uvw.x() * mci.normals[ind0] +
-            uvw.y() * mci.normals[ind1] +
-            uvw.z() * mci.normals[ind2];
+        cpm::vec3 point = uvw.x * mci.positions[ind0] +
+            uvw.y * mci.positions[ind1] +
+            uvw.z * mci.positions[ind2];
+        cpm::vec3 normal = uvw.x * mci.normals[ind0] +
+            uvw.y * mci.normals[ind1] +
+            uvw.z * mci.normals[ind2];
 
         return { point, normal };
     }
@@ -385,7 +385,7 @@ public:
         auto& n0 = mci.normals[ii0];
         auto& n1 = mci.normals[ii1];
         auto& n2 = mci.normals[ii2];
-        out_normal = cpm::vec3::normalize(n0 * uvw.x() + n1 * uvw.y() + n2 * uvw.z());
+        out_normal = cpm::vec3::normalize(n0 * uvw.x + n1 * uvw.y + n2 * uvw.z);
         return true;
     }
     __host__ __device__ bool interpolate_by_st(const cpm::vec2& st, cpm::vec3& out_position, cpm::vec3& out_normal) const {
