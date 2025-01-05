@@ -46,9 +46,9 @@ private:
         if (out_incident_model == nullptr) {
             return false;
         }
-        out_intersection_point = ray.origin + ray.direction * intersection;
+        out_intersection_point = (ray.direction * intersection).add(ray.origin);
         if (reverse_normal && cpm::vec3::dot(ray.direction, out_normal) > 0) {
-            out_normal *= -1.f;
+            out_normal.mult(-1.f);
         }
         return true;
     }
@@ -152,75 +152,6 @@ private:
         return res;
     }
 
-
-
-
-
-
-
-
-    /* floats operation:
-    *  86 + some index operations!!!!
-    *  86 * 2188 * (100*100) = 1.882 לכנה
-    */
-
-    __host__ __device__ bool traingle_intersection(const cpm::Ray& ray,
-            const cpm::vec3& v0, const cpm::vec3& v1, const cpm::vec3& v2,
-            float& out_ray_parameter, cpm::vec3& out_uvw) const {
-        out_ray_parameter = 0.f;
-        // compute the plane's normal
-        cpm::vec3 v0v1 = v1 - v0; //! 3 floats
-        cpm::vec3 v0v2 = v2 - v0; //! 3 floats
-        // no need to normalize
-        // Normal of the triangle plane
-        cpm::vec3 N = cpm::vec3::cross(v0v1, v0v2); //! 9 floats
-        float denom = cpm::vec3::dot(N, N); //! 5 floats
-
-        // Step 1: finding P
-
-        // check if the ray and plane are parallel.
-        float NdotRayDirection = cpm::vec3::dot(N, ray.direction); //! 5 floats
-        if (fabsf(NdotRayDirection) < model_eps) // almost 0
-            return false; // they are parallel so they don't intersect! 
-
-        // compute t (equation 3)
-        out_ray_parameter = (cpm::vec3::dot(N, v0) - cpm::vec3::dot(N, ray.origin)) / NdotRayDirection;//! 5+5+1=11 floats
-         //check if the triangle is behind the ray
-        if (out_ray_parameter < 0) return false; // the triangle is behind
-
-        // compute the intersection point using equation 1
-        cpm::vec3 P = ray.origin.copy().add(out_ray_parameter).mult(ray.direction); //! 3+3=6 floats
-
-        // Step 2: inside-outside test
-
-        // edge 0
-        cpm::vec3 edge0 = v1 - v0; //! 3 floats
-        cpm::vec3 vp0 = P - v0; //! 3 floats
-        // vector perpendicular to triangle's plane
-        float w = cpm::vec3::dot(N, edge0.cross(vp0)); //! 9+5=14 floats
-        if (w < 0) return false; // P is on the right side
-
-        // edge 2
-        cpm::vec3 edge2 = v0 - v2; //! 3 floats
-        cpm::vec3 vp2 = P - v2; //! 3 floats
-        float v = cpm::vec3::dot(N, edge2.cross(vp2)); //! 9+5=14 floats
-        if (v < 0) return false; // P is on the right side;
-        w /= denom; //! 1 floats
-        v /= denom; //! 1 floats
-        float u = 1.f - v - w; //! 2 floats
-        if (u < 0) {
-            return false;
-        }
-        out_uvw[0] = u;
-        out_uvw[1] = v;
-        out_uvw[2] = w;
-        return true; // this ray hits the triangle
-    }
-
-
-
-
-
    public:
   
     __device__ void render_gpu(uchar3* canvas, int width, int height) {
@@ -246,16 +177,17 @@ private:
         cpm::vec3 dir = scene.camera.generate_ray_direction(x, y);
         cpm::Ray ray(origin, dir);
 
-        /*cpm::vec3 p1 = scene.models->mci.positions[0];
-        cpm::vec3 p2 = scene.models->mci.positions[0];
-        Model* m;
+       /* Model* m;
         cpm::vec3 t1, t2;
-        bool res = find_intersection(ray, false, m, t1,t2);
-        if (res) {
-            canvas[id] = make_uchar3(255, 255, 255);
-        }
-        else {
-            canvas[id] = make_uchar3(0, 0, 0);
+        for (int i = 0; i < 10; i++) {
+            ray.origin -= cpm::vec3(0, 0, 0.001f);
+            bool res = find_intersection(ray, false, m, t1, t2);
+            if (res) {
+                canvas[id] = make_uchar3((255 * i) % 255, t1.x * 255, t2.y * 255);
+            }
+            else {
+                canvas[id] = make_uchar3(0, 0, 0);
+            }
         }*/
 
         /*float outf;

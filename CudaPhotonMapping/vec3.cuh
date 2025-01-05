@@ -65,6 +65,13 @@ namespace cpm {
         __host__ __device__ inline vec3 operator-() const {
             return vec3(-x, -y, -z);
         }
+        
+        __host__ __device__ inline void operator=(const vec3& other) {
+            x = other.x;
+            y = other.y;
+            z = other.z;
+        }
+
 
         __host__ __device__ constexpr vec3& operator+=(const vec3& v) {
 #ifdef USE_INTRINSICS
@@ -186,10 +193,11 @@ namespace cpm {
 #endif
         }
 
-        __host__ __device__ constexpr void normalize() {
+        __host__ __device__ constexpr vec3& normalize() {
             if (!is_null()) {
                 *this /= this->length();
             }
+            return *this;
         }
 
         __host__ __device__ static inline vec3 normalize(vec3 v) {
@@ -373,34 +381,75 @@ namespace cpm {
             return vec3(x, y, z);
         }
         __host__ __device__ vec3& add(const vec3& other) {
+#ifdef USE_INTRINSICS
+            x = __fadd_rz(x, other.x);
+            y = __fadd_rz(y, other.y);
+            z = __fadd_rz(z, other.z);
+#else
             x += other.x;
             y += other.y;
             z += other.z;
+#endif
             return *this;
         }
         __host__ __device__ vec3& mult(float t) {
+#ifdef USE_INTRINSICS
+            x = __fmul_rz(x, t);
+            y = __fmul_rz(y, t);
+            z = __fmul_rz(z, t);
+#else
             x *= t;
             y *= t;
             z *= t;
+#endif
             return *this;
         }
         __host__ __device__ vec3& mult(const vec3& other) {
+#ifdef USE_INTRINSICS
+            x = __fmul_rz(x, other.x);
+            y = __fmul_rz(y, other.y);
+            z = __fmul_rz(z, other.z);
+#else
             x *= other.x;
             y *= other.y;
             z *= other.z;
+#endif
             return *this;
         }
         __host__ __device__ vec3& sub(const vec3& other) {
+#ifdef USE_INTRINSICS
+            x = __fsub_rz(x, other.x);
+            y = __fsub_rz(y, other.y);
+            z = __fsub_rz(z, other.z);
+#else
             x -= other.x;
             y -= other.y;
             z -= other.z;
+#endif
             return *this;
         }
         __host__ __device__ vec3& cross(const vec3& other) {
+#ifdef USE_INTRINSICS
+            x = __fsub_rz(
+                __fmul_rz(y, other.z),
+                __fmul_rz(z, other.y)
+            );
+            y = __fmul_rz(
+                __fsub_rz(
+                    __fmul_rz(x, other.z),
+                    __fmul_rz(z, other.x)
+                ),
+                -1
+            );
+            z = __fsub_rz(
+                __fmul_rz(x, other.y),
+                __fmul_rz(y, other.x)
+            );
+#else
             x = y * other.z - z * other.y;
             y = x * other.z - z * other.x;
             z = x * other.y - y * other.x;
-
+#endif
             return *this;
         }
 
