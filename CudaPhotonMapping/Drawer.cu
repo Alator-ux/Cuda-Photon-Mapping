@@ -27,7 +27,7 @@ void Drawer::draw_in_gpu(int frame) {
 
 	int block = 256;
 	int grid = (width * height + block - 1) / block;
-	int shared_memory = block * sizeof(Raytracer::IntersectionInfo);
+	int shared_memory = block * sizeof(cpm::vec3*) * 3;
 	timer.startCUDA();
 	//compute << <grid, block >> > (gpu_canvas, width, height, frame);
 	gpu_kernel << <grid, block, shared_memory >> > (gpu_canvas, gpu_raytracer, width, height);

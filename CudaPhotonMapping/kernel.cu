@@ -13,7 +13,7 @@ __global__ void kernel(ModelConstructInfo* mci, int size, curandState* curandSta
     if (ind >= size) return;
 
     Printer printer;
-    printer.string("Position[").integer(ind).string("] = ").vec3(mci->positions[ind]).new_line();
+    printer.s("Position[").i(ind).s("] = ").v3(mci->positions[ind]).nl();
 
    curandState local_state = curandStates[ind];
    auto a = cpm::fmap_to_range(1.f, 2.f, 3.f);
@@ -112,6 +112,10 @@ int main(int argc, char * argv[]) {
     int height = 1080;*/
     /*int width = 100;
     int height = 100;*/
+
+    cudaDeviceProp prop;
+    cudaGetDeviceProperties(&prop, 0);
+    Printer::cuda_properties(prop);
 
     Camera camera(cpm::vec3(-0.00999999046, 0.795000017, 2.35000001), cpm::vec3(0.f, 0.f, -1.f), cpm::vec3(0.f, 1.f,0.f),
                   60, width, height); // TODO remove hardcode;

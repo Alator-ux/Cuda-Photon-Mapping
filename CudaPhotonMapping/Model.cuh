@@ -337,6 +337,75 @@ public:
     /* =============
     *  Other Section
     *  ============= */
+    __device__ bool intersection_gpu(const cpm::Ray& ray, bool in_object, float& intersection,
+        cpm::vec3& out_uvw) const {
+        // Length = 256*3
+        extern __shared__ cpm::vec3* normal_ptrs[];
+
+        intersection = FLT_MAX;
+        size_t i = 0;
+        bool intersection_found;
+        int primitive_index = 0;
+        while (primitive_index < mci.primitives_size) {
+            float possible_ray_parameter = 0.f;
+            cpm::vec3 possible_uvw;
+            if (mci.type == ModelType::Triangle) {
+                cpm::vec3 v0 = mci.positions[i];
+                cpm::vec3 v1 = mci.positions[i + 1];
+                cpm::vec3 v2 = mci.positions[i + 2];
+                intersection_found = traingle_intersection(ray, in_object,
+                    v0, v1, v2,
+                    possible_ray_parameter, possible_uvw);
+                if (intersection_found && possible_ray_parameter < intersection) {
+                    intersection = possible_ray_parameter;
+                    out_uvw = possible_uvw;
+                    normal_ptrs[threadIdx.x]     = mci.normals + i;
+                    normal_ptrs[threadIdx.x + 1] = mci.normals + i + 1;
+                    normal_ptrs[threadIdx.x + 2] = mci.normals + i + 2;
+                }
+                i += 3;
+            }
+            else if (mci.type == ModelType::Quad) {
+                intersection_found = traingle_intersection(ray, in_object,
+                    mci.positions[i], mci.positions[i + 1], mci.positions[i + 3],
+                    possible_ray_parameter, possible_uvw);
+                if (intersection_found && possible_ray_parameter < intersection) {
+                    intersection = possible_ray_parameter;
+                    out_uvw = possible_uvw;
+                    normal_ptrs[threadIdx.x]     = mci.normals + i;
+                    normal_ptrs[threadIdx.x + 1] = mci.normals + i + 1;
+                    normal_ptrs[threadIdx.x + 2] = mci.normals + i + 3;
+                }
+                else {
+                    possible_ray_parameter = 0.f;
+                    intersection_found = traingle_intersection(ray, in_object,
+                        mci.positions[i + 1], mci.positions[i + 2], mci.positions[i + 3],
+                        possible_ray_parameter, possible_uvw);
+                    if (intersection_found && possible_ray_parameter < intersection) {
+                        intersection = possible_ray_parameter;
+                        out_uvw = possible_uvw;
+                        normal_ptrs[threadIdx.x]     = mci.normals + i + 1;
+                        normal_ptrs[threadIdx.x + 1] = mci.normals + i + 2;
+                        normal_ptrs[threadIdx.x + 2] = mci.normals + i + 3;
+                    }
+                }
+                i += 4;
+            }
+            else {
+                printf("Unknown model vertex organization\n");
+            }
+            primitive_index++;
+        }
+        
+        if (intersection == FLT_MAX) {
+            return false;
+        }
+        // TODO Think about access to memory
+        /*out_normal = cpm::vec3::normalize(n0 * uvw.x + n1 * uvw.y + n2 * uvw.z);*/
+
+        return true;
+    }
+
     __host__ __device__ bool intersection(const cpm::Ray& ray, bool in_object, float& intersection,
         size_t& ii0, size_t& ii1, size_t& ii2,
         cpm::vec3& out_normal) const {

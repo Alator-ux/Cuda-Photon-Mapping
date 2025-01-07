@@ -18,7 +18,44 @@ private:
     Scene scene;
 //    MediumManager* medium_manager;
 
-    __host__ __device__ bool find_intersection(const cpm::Ray& ray, bool reverse_normal, 
+    __device__ bool find_intersection_v2(const cpm::Ray& ray, bool reverse_normal, 
+        Model*& out_incident_model, cpm::vec3& out_normal, cpm::vec3& out_intersection_point) {
+        // Length = 256*3
+        extern __shared__ cpm::vec3* normal_ptrs[];
+
+        float intersection = 0.f;
+        out_incident_model = nullptr;
+
+        cpm::vec3 uvw;
+
+        int models_number = scene.models_number;
+        Model* models = scene.models;
+        for (int i = 0; i < models_number; i++) {
+            Model* model = models + i;
+
+            float temp_inter;
+            cpm::vec3 tuvw;
+            bool succ = model->intersection_gpu(ray, false, temp_inter, tuvw);
+            if (succ && (intersection == 0.f || temp_inter < intersection)) {
+                intersection = temp_inter;
+                uvw = tuvw;
+                out_incident_model = model;
+            }
+        }
+        if (out_incident_model == nullptr) {
+            return false;
+        }
+        out_intersection_point = (ray.direction * intersection).add(ray.origin);
+
+        out_normal = cpm::interpolate_uvw_with_clone(
+            *normal_ptrs[threadIdx.x], *normal_ptrs[threadIdx.x + 1], *normal_ptrs[threadIdx.x + 2], uvw);
+        if (reverse_normal && cpm::vec3::dot(ray.direction, out_normal) > 0) {
+            out_normal.mult(-1.f);
+        }
+        return true;
+    }
+
+    __host__ __device__ bool find_intersection(const cpm::Ray& ray, bool reverse_normal,
         Model*& out_incident_model, cpm::vec3& out_normal, cpm::vec3& out_intersection_point) {
         float intersection = 0.f;
         out_incident_model = nullptr;
@@ -53,7 +90,7 @@ private:
         return true;
     }
 
-    __host__ __device__ bool find_intersection(const cpm::Ray& ray, bool reverse_normal, IntersectionInfo* intersection_info) {
+    /*__host__ __device__ bool find_intersection(const cpm::Ray& ray, bool reverse_normal, IntersectionInfo* intersection_info) {
         float intersection = 0.f;
         Model* out_incident_model = nullptr;
         cpm::vec3 out_normal, out_intersection_point;
@@ -91,7 +128,7 @@ private:
         intersection_info->normal = out_normal;
 
         return true;
-    }
+    }*/
 
     __host__ __device__ cpm::vec3 render_trace(const cpm::Ray& ray, bool in_object, int depth) {
         cpm::vec3 res(0.f);
@@ -155,7 +192,6 @@ private:
    public:
   
     __device__ void render_gpu(uchar3* canvas, int width, int height) {
-        extern __shared__ int intersection_infos[];
         /*int x = blockIdx.x * blockDim.x + threadIdx.x;
         int y = blockIdx.y * blockDim.y + threadIdx.y;
         int local_id = threadIdx.y * blockDim.x + threadIdx.x;
@@ -163,8 +199,6 @@ private:
 
         int id = blockIdx.x * blockDim.x + threadIdx.x;
         if (id >= width * height) {
-            atomicAdd(&intersection_infos[0], 1);
-            printf("total %i", intersection_infos[0]);
             return;
         }
         int x = id % width;
@@ -177,18 +211,18 @@ private:
         cpm::vec3 dir = scene.camera.generate_ray_direction(x, y);
         cpm::Ray ray(origin, dir);
 
-       /* Model* m;
+        Model* m;
         cpm::vec3 t1, t2;
         for (int i = 0; i < 10; i++) {
             ray.origin -= cpm::vec3(0, 0, 0.001f);
-            bool res = find_intersection(ray, false, m, t1, t2);
+            bool res = find_intersection_v2(ray, false, m, t1, t2);
             if (res) {
                 canvas[id] = make_uchar3((255 * i) % 255, t1.x * 255, t2.y * 255);
             }
             else {
                 canvas[id] = make_uchar3(0, 0, 0);
             }
-        }*/
+        }
 
         /*float outf;
         cpm::vec3 outv;
@@ -203,8 +237,8 @@ private:
         }*/
 
         //find_intersection(ray, false, intersection_infos + local_id);
-        cpm::vec3 pixel_color = render_trace(ray, false, 0);
-        canvas[id] = make_uchar3(pixel_color.x * 255, pixel_color.y * 255, pixel_color.z * 255);
+        /*cpm::vec3 pixel_color = render_trace(ray, false, 0);
+        canvas[id] = make_uchar3(pixel_color.x * 255, pixel_color.y * 255, pixel_color.z * 255);*/
     }
 
     void render_cpu(uchar3* canvas) {
