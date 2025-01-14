@@ -2,6 +2,7 @@
 #include <crt/host_defines.h>
 #include "ostream"
 #include "iostream"
+#include "vector_types.h"
 
 /* This class can be used by both host and device. Please note that the file is
  * compiled twice, once for the host and once for the device. The latter sets
@@ -17,7 +18,7 @@ namespace {
 #define USE_INTRINSICS
 #endif
 namespace cpm {
-    struct vec3 {
+    struct alignas(16) vec3 {
         float x, y, z;
 
         __host__ __device__ vec3() {
@@ -36,6 +37,12 @@ namespace cpm {
             x = v1;
             y = v2;
             z = v3;
+        }
+
+        __host__ __device__ vec3(float4 f4) {
+            x = f4.x;
+            y = f4.y;
+            z = f4.z;
         }
 
         // TODO: Use __saturatef to saturate float values

@@ -13,7 +13,7 @@
 #define USE_INTRINSICS
 #endif
 namespace cpm {
-    class vec2 {
+    struct alignas(8) vec2 {
     public:
         __host__ __device__ vec2() {
             _v[0] = 0.f;

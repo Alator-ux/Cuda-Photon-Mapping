@@ -39,6 +39,9 @@ public:
     cpm::vec3* positions;
     cpm::vec2* texcoords;
     cpm::vec3* normals;
+    //cudaTextureObject_t positions_texture;
+    //cudaTextureObject_t texcoords_texture;
+    //cudaTextureObject_t normals_texture;
     int size;
     int primitives_size;
     Material material;

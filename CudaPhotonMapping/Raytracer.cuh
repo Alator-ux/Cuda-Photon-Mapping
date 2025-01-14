@@ -22,10 +22,10 @@ private:
         Model*& out_incident_model, cpm::vec3& out_normal, cpm::vec3& out_intersection_point) {
         // Length = 256*3
         extern __shared__ cpm::vec3* normal_ptrs[];
+        int thread_ptr_start = threadIdx.x * 3;
 
         float intersection = 0.f;
         out_incident_model = nullptr;
-
         cpm::vec3 uvw;
 
         int models_number = scene.models_number;
@@ -48,7 +48,7 @@ private:
         out_intersection_point = (ray.direction * intersection).add(ray.origin);
 
         out_normal = cpm::interpolate_uvw_with_clone(
-            *normal_ptrs[threadIdx.x], *normal_ptrs[threadIdx.x + 1], *normal_ptrs[threadIdx.x + 2], uvw);
+            *normal_ptrs[thread_ptr_start], *normal_ptrs[thread_ptr_start + 1], *normal_ptrs[thread_ptr_start + 2], uvw);
         if (reverse_normal && cpm::vec3::dot(ray.direction, out_normal) > 0) {
             out_normal.mult(-1.f);
         }
@@ -59,7 +59,6 @@ private:
         Model*& out_incident_model, cpm::vec3& out_normal, cpm::vec3& out_intersection_point) {
         float intersection = 0.f;
         out_incident_model = nullptr;
-        size_t ii0, ii1, ii2;
 
         int models_number = scene.models_number;
         Model* models = scene.models;
@@ -67,15 +66,10 @@ private:
             Model* model = models + i;
 
             float temp_inter;
-            size_t tii0, tii1, tii2;
             cpm::vec3 tnormal;
-            bool succ = model->intersection(ray, false, temp_inter,
-                tii0, tii1, tii2, tnormal);
+            bool succ = model->intersection(ray, false, temp_inter, tnormal);
             if (succ && (intersection == 0.f || temp_inter < intersection)) {
                 intersection = temp_inter;
-                ii0 = tii0;
-                ii1 = tii1;
-                ii2 = tii2;
                 out_incident_model = model;
                 out_normal = tnormal;
             }
@@ -211,18 +205,18 @@ private:
         cpm::vec3 dir = scene.camera.generate_ray_direction(x, y);
         cpm::Ray ray(origin, dir);
 
-        Model* m;
+        /*Model* m;
         cpm::vec3 t1, t2;
         for (int i = 0; i < 10; i++) {
             ray.origin -= cpm::vec3(0, 0, 0.001f);
-            bool res = find_intersection_v2(ray, false, m, t1, t2);
+            bool res = find_intersection(ray, false, m, t1, t2);
             if (res) {
                 canvas[id] = make_uchar3((255 * i) % 255, t1.x * 255, t2.y * 255);
             }
             else {
                 canvas[id] = make_uchar3(0, 0, 0);
             }
-        }
+        }*/
 
         /*float outf;
         cpm::vec3 outv;
@@ -237,8 +231,8 @@ private:
         }*/
 
         //find_intersection(ray, false, intersection_infos + local_id);
-        /*cpm::vec3 pixel_color = render_trace(ray, false, 0);
-        canvas[id] = make_uchar3(pixel_color.x * 255, pixel_color.y * 255, pixel_color.z * 255);*/
+        cpm::vec3 pixel_color = render_trace(ray, false, 0);
+        canvas[id] = make_uchar3(pixel_color.x * 255, pixel_color.y * 255, pixel_color.z * 255);
     }
 
     void render_cpu(uchar3* canvas) {
