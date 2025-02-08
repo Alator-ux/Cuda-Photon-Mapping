@@ -4,6 +4,7 @@
 #include "vec3.cuh"
 #include "CudaUtils.cuh"
 #include "vec3.cuh"
+#include "Defines.cuh"
 
 namespace {
     constexpr float pi = 3.141592653589793;
@@ -75,7 +76,8 @@ struct Camera {
         cpm::vec3 lower_left_corner = position.copy().add(forward).mult(focal_length)
             .sub(horizontal.copy().mult(0.5f)).sub(vertical.copy().mult(0.5f));
 
-        return cpm::vec3::normalize(lower_left_corner.add(horizontal.mult(u)).add(vertical.mult(v)).sub(position));
+        // No need to normalize because of normalization in Ray constructor
+        return lower_left_corner.add(horizontal.mult(u)).add(vertical.mult(v)).sub(position);
     }
 
     __host__ void move(const cpm::vec3& direction, float amount) {

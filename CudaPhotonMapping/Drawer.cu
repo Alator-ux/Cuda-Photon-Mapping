@@ -1,4 +1,7 @@
 #include "Drawer.cuh"
+#include "Defines.cuh"
+
+#define THREADS_NUMBER 256
 
 __global__ void compute(uchar3* canvas, int width, int height, int frame) {
 	/*int x = blockIdx.x * blockDim.x + threadIdx.x;
@@ -25,12 +28,12 @@ void Drawer::draw_in_gpu(int frame) {
 	dim3 grid((width + block.x - 1) / block.x, (height + block.y - 1) / block.y);
 	int shared_memory = block.x * block.y * sizeof(Raytracer::IntersectionInfo);*/
 
-	int block = 256;
-	int grid = (width * height + block - 1) / block;
-	int shared_memory = block * sizeof(cpm::vec3*) * 3;
+	int threads = THREADS_NUMBER;
+	int blocks = (width * height + threads - 1) / threads;
+	int shared_memory = threads * sizeof(cpm::vec3*) * 3;
 	timer.startCUDA();
 	//compute << <grid, block >> > (gpu_canvas, width, height, frame);
-	gpu_kernel << <grid, block, shared_memory >> > (gpu_canvas, gpu_raytracer, width, height);
+	gpu_kernel << <blocks, threads, shared_memory >> > (gpu_canvas, gpu_raytracer, width, height);
 	timer.stopCUDA();
 	timer.printCUDA();
 	checkCudaErrors(cudaGetLastError());
@@ -53,6 +56,29 @@ void Drawer::Draw(int frame) {
 	}
 }
 
+__global__ void gpu_initialize_kernel(Raytracer* raytracer, Scene* scene, RaytracePlanner* planner) {
+	if (scene != nullptr) {
+		raytracer->set_scene(scene);
+	}
+	if (planner != nullptr) {
+		raytracer->set_planner(planner);
+	}
+}
+
+void Drawer::initialize_raytracer() {
+	int size = width * height; // 786 432
+	cpu_raytracer->initialize_cpu(size);
+
+	cudaMalloc(&gpu_raytracer, sizeof(Raytracer));
+	auto gpu_planner = RaytracePlanner::initialize_gpu(size, 4, 1.f);
+	
+	gpu_initialize_kernel << <1, 1 >> > (gpu_raytracer, nullptr, gpu_planner);
+	CudaSynchronizer::synchronize_with_instance();
+	checkCudaErrors(cudaGetLastError());
+	Printer().s("Raytracer initialized").nl();
+	Printer::cuda_properties();
+}
+
 void Drawer::change_render_mode() {
 	set_render_mode(render_mode == RenderMode::cpu ? RenderMode::gpu : RenderMode::cpu);
 }
@@ -65,11 +91,13 @@ void Drawer::set_render_mode(RenderMode render_mode) {
 }
 
 void Drawer::set_scenes(Scene* cpu_scene, Scene* gpu_scene) {
-	Scene* fake_gpu_scene = (Scene*)malloc(sizeof(Scene));
-	cudaMemcpy(fake_gpu_scene, gpu_scene, sizeof(Scene), cudaMemcpyDeviceToHost);
-	cpu_raytracer->set_scene(fake_gpu_scene);
-	cudaMemcpy(gpu_raytracer, cpu_raytracer, sizeof(Raytracer), cudaMemcpyHostToDevice);
 	cpu_raytracer->set_scene(cpu_scene);
+	gpu_initialize_kernel << <1, 1 >> > (gpu_raytracer, gpu_scene, nullptr);
+	cudaEvent_t cu_event;
+	cudaEventCreate(&cu_event);
+	cudaEventSynchronize(cu_event);
+	checkCudaErrors(cudaGetLastError());
+	Printer().s("Scene updated").nl();
 }
 
 RenderMode Drawer::get_render_mode() {

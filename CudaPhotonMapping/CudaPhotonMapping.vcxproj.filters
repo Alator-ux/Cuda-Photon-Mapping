@@ -53,6 +53,13 @@
     <CudaCompile Include="CudaOpenGLUtils.cu">
       <Filter>Tools\CudaOpenGLUtils</Filter>
     </CudaCompile>
+    <CudaCompile Include="Initializer.cu" />
+    <CudaCompile Include="RaytracePlanner.cu">
+      <Filter>Tracing</Filter>
+    </CudaCompile>
+    <CudaCompile Include="CudaUtils.cu">
+      <Filter>Tools\CudaUtils</Filter>
+    </CudaCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Printers.h">
@@ -112,9 +119,6 @@
     <ClInclude Include="Material.cuh">
       <Filter>Model\Material</Filter>
     </ClInclude>
-    <ClInclude Include="CudaUtils.cuh">
-      <Filter>Tools</Filter>
-    </ClInclude>
     <ClInclude Include="Drawer.cuh">
       <Filter>Render</Filter>
     </ClInclude>
@@ -148,9 +152,6 @@
     <ClInclude Include="Camera.cuh">
       <Filter>Tracing</Filter>
     </ClInclude>
-    <ClInclude Include="MediumManager.cuh">
-      <Filter>DataStructures</Filter>
-    </ClInclude>
     <ClInclude Include="OpenglLayer.h">
       <Filter>Render</Filter>
     </ClInclude>
@@ -162,6 +163,21 @@
     </ClInclude>
     <ClInclude Include="Timer.cuh">
       <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="Initializer.cuh" />
+    <ClInclude Include="RefractiveTable.cuh" />
+    <ClInclude Include="CuOptStack.cuh">
+      <Filter>DataStructures</Filter>
+    </ClInclude>
+    <ClInclude Include="MediumManager.cuh">
+      <Filter>Tracing</Filter>
+    </ClInclude>
+    <ClInclude Include="RaytracePlanner.cuh">
+      <Filter>Tracing</Filter>
+    </ClInclude>
+    <ClInclude Include="Defines.cuh" />
+    <ClInclude Include="CudaUtils.cuh">
+      <Filter>Tools\CudaUtils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -215,6 +231,9 @@
     </Filter>
     <Filter Include="Tools\CudaOpenGLUtils">
       <UniqueIdentifier>{7d5ee711-e3b2-46ff-8268-b90a7c4f308e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tools\CudaUtils">
+      <UniqueIdentifier>{7b1d5b66-f0b7-4e0d-8325-796ee9bcc6d6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

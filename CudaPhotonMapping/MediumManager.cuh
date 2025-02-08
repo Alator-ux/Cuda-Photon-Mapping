@@ -1,113 +1,100 @@
-//#pragma once
-//#include <crt/host_defines.h>
-//#include <cuda_runtime.h>
-//#include "DeepLookStack.cuh"
-//#include "Pair.cuh"
-//
-//class MediumManager {
-//    struct StackContent {
-//        cpm::DeepLookStack<cpm::pair<float, size_t>> mediums;
-//        bool exiting;
-//        StackContent(size_t stack_depth, bool exiting = false) : mediums(stack_depth), exiting(exiting) {}
-//        StackContent() : mediums(0), exiting(false) {}
-//        /*StackContent(const cpm::DeepLookStack<cpm::pair<float, size_t>>& mediums, bool exiting) {
-//            this->mediums = mediums;
-//            this->exiting = exiting;
-//        }*/
-//    };
-//    cpm::stack<StackContent> mediums_stack;
-//    float default_refraction;
-//    /// <summary>
-//    /// ca_table — critical angle table.
-//    /// Map with critical angles for each medium pair in the scene.
-//    /// <param name="Key"> is the division of the refractive coefficients of the two media through which light passes</param>
-//    /// <param name="Value"> is a critical angle for this mediums in radians</param>
-//    /// </summary>
-//    std::map<std::pair<float, float>, float> ca_table;
-//    void calc_angle(float eta1, float eta2) {
-//        float eta = eta2 / eta1;
-//        if (eta < 1.f && ca_table.find({ eta1, eta2 }) == ca_table.end()) {
-//            float ca = std::cos(std::asin(eta));
-//            ca_table[{eta1, eta2}] = ca;
-//        }
-//    }
-//public:
-//    MediumManager(size_t stack_depth, float def_refr = 1.f) : default_refraction(def_refr), mediums_stack(stack_depth) {
-//        clear();
-//    }
-//    MediumManager(float def_refr = 1.f) : default_refraction(def_refr), mediums_stack(0) {
-//        clear();
-//    }
-//    void compute_critical_angles(Scene scene)
-//    {
-//        Model* models = scene.models; 
-//        int models_number = scene.models_number;
-//
-//        float eta1, eta2, eta, ca;
-//        for (int i = 0; i < models_number; i++) {
-//            for (int j = i + 1; j < models_number; j++) {
-//                eta1 = models[i].get_material()->refr_index;
-//                eta2 = models[j].get_material()->refr_index;
-//                calc_angle(eta1, eta2); // from eta1 medium to eta2 medium
-//                calc_angle(eta2, eta1); // from eta2 medium to eta1 medium
-//            }
-//
-//            eta1 = models[i].get_material()->refr_index;
-//            calc_angle(default_refraction, eta1); // from eta1 medium to eta2 medium
-//            calc_angle(eta1, default_refraction); // from eta2 medium to eta1 medium
-//        }
-//    };
-//    bool can_refract(const std::pair<float, float>& cn, float cosNL) {
-//        if (ca_table.find(cn) == ca_table.end()) {
-//            return true;
-//        }
-//        return cosNL > ca_table[cn]; // <= ?
-//    }
-//    //std::pair<float, float> get_cur_new(const PMModel* model) {
-//    //    std::pair<float, float> res;
-//    //    auto& mediums = st_mediums.top().mediums;
-//    //    auto& exiting = st_mediums.top().exiting;
-//    //    if (model->equal(mediums.peek().second)) {
-//    //        // Если луч столкнулся с объектом, в котором он находится, с внутренней стороны
-//    //        // Надо достать внешнюю по отношению к объекту среду. На вершине стека лежит объект, 
-//    //        // в котором находится луч
-//    //        // текущая среда - среда объекта, по которому ударил луч, т.к. мы внутри
-//    //        res.first = model->get_material()->refr_index;
-//    //        res.second = mediums.peek(1).first;
-//    //        exiting = true;
-//    //        return res;
-//    //    }
-//    //    // Если луч входит в новый объект
-//    //    res.first = mediums.peek().first;
-//    //    res.second = model->get_material()->refr_index;
-//    //    exiting = false;
-//    //    return res;
-//    //}
-//    //void inform(bool refract_suc, const PMModel* model) {
-//    //    if (!refract_suc) {
-//    //        return;
-//    //    }
-//    //    auto& mediums = st_mediums.top().mediums;
-//    //    auto& exiting = st_mediums.top().exiting;
-//    //    if (exiting && model->equal(mediums.peek().second)) {
-//    //        // если луч вышел из объекта, то убираем со стека текущую среду
-//    //        mediums.pop();
-//    //        exiting = false;
-//    //    }
-//    //    else { // иначе луч пересек еще один объект, добавляем текущую среду
-//    //        mediums.push({ model->get_material()->refr_index, model->get_id() });
-//    //    }
-//    //}
-//    //void increase_depth() {
-//    //    st_mediums.push(st_mediums.top());
-//    //}
-//    //void reduce_depth() {
-//    //    st_mediums.pop();
-//    //}
-//    //void clear() {
-//    //    auto default_m = DeepLookStack<std::pair<float, size_t>>();
-//    //    default_m.push({ default_refr, 0 });
-//    //    st_mediums = std::stack<StackContent>();
-//    //    st_mediums.push(StackContent(default_m, false));
-//    //}
-//};
+#pragma once
+#include <crt/host_defines.h>
+#include <cuda_runtime.h>
+#include "DeepLookStack.cuh"
+#include "Pair.cuh"
+#include "Tuple3.h"
+
+
+#define MediumManager_Version_1
+
+class MediumManager {
+public:
+    struct MediumContent {
+        float refractive_index;
+        int   hit_id;
+        //unsigned int inside_level;
+    };
+
+#define MMInnerData MediumManager::MediumContent
+#define MMInnerContainer cpm::stack<MMInnerData>
+#define MMOuterContainer cpm::stack<MMInnerContainer>
+
+#ifdef MediumManager_Version_1
+    MMOuterContainer mediums_stack;
+#endif // MediumManager_Version_1
+private:
+public:
+    MediumManager() : mediums_stack(0) {}
+#ifdef MediumManager_Version_1
+    MediumManager(int stack_capacity) :  mediums_stack(stack_capacity) {}
+#endif // MediumManager_Version_1
+
+    __host__ __device__ void intialize(
+        int stack_capacity, float default_refractive_index, unsigned int default_inside_level) {
+        
+        mediums_stack = MMOuterContainer(stack_capacity);
+        mediums_stack.set_size(1);
+        auto mediums_data = mediums_stack.get_data();
+
+        /* 4 (outer pointer) + 4 + 4 (size, capacity) + 8 (outer stack_capacity) * 
+        *  (4 (inner pointer) + 4 + 4 (size, capacity) + 8 (inner stack_capacity) * ( 4 (refr index) + 4 (hit id))) =
+        * = 116
+        */
+        /* 24 + 8 * (24 + 8 * 8) = 
+        */
+        for (int i = 0; i < stack_capacity; i++) {
+            mediums_data[i] = cpm::DeepLookStack<MediumContent>(stack_capacity);
+            mediums_data[i].push({default_refractive_index, -1});
+        }
+    }
+    __host__ __device__ cpm::Tuple3<float, float, bool> get_refractive_indices(
+        size_t model_id, float model_refractive_index) {
+        
+        auto mediums = mediums_stack.top();
+        auto medium = mediums.top();
+
+        if (medium.hit_id == model_id) {
+            return { model_refractive_index, mediums.top(1).refractive_index, false };
+        }
+
+        return { medium.refractive_index, model_refractive_index, true };
+    }
+    __host__ __device__ void increase_depth(bool& replace_medium) {
+        if (replace_medium) {
+            replace_medium = false;
+            return;
+        }
+
+        if (mediums_stack.get_size() < 2) {
+            mediums_stack.push_copy(mediums_stack.top());   
+        }
+        else {
+            mediums_stack.push_copy(mediums_stack.top(), 1);
+        }
+    }
+    __host__ __device__ void reduce_depth() {
+        mediums_stack.pop();
+    }
+    __host__ __device__ void inform(int model_id, float model_refractive_index) {
+        auto mediums = mediums_stack.top_pointer();
+        auto medium = mediums->top();
+        if (medium.hit_id == model_id) {
+            mediums->pop();
+        }
+        else {
+            mediums->push({ model_refractive_index, model_id });
+        }
+    }
+    __host__ __device__ void set_data(MMInnerContainer* medium_manager_inner_container, 
+        MMInnerData* medium_manager_innder_data, size_t stack_cap, 
+        float default_refractive_index) {
+        mediums_stack.set_data(medium_manager_inner_container, stack_cap, 1);
+
+        for (size_t i = 0; i < stack_cap; i++) {
+            medium_manager_inner_container[i].set_data(medium_manager_innder_data + stack_cap * i, stack_cap);
+            medium_manager_inner_container[i].push({ default_refractive_index, -1});
+        }
+    }
+
+};

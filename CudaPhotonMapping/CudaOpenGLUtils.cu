@@ -1,4 +1,5 @@
 #include "CudaOpenGLUtils.cuh"
+#include "Defines.cuh"
 
 void create_pbo(GLuint* pbo, cudaGraphicsResource** cgr, unsigned int size_bytes, unsigned int flags) {
 	glGenBuffers(1, pbo);

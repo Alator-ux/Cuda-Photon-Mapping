@@ -15,4 +15,12 @@ struct Scene {
         : models(models), models_number(models_number),
         light_sources(light_sources), light_sources_number(light_sources_number),
         camera(camera) {}
+
+    __host__ __device__ inline void operator=(const Scene& other) {
+        this->models = other.models;
+        this->models_number = other.models_number;
+        this->light_sources = other.light_sources;
+        this->light_sources_number = other.light_sources_number;
+        this->camera = Camera(other.camera);
+    }
 };

@@ -459,7 +459,11 @@ namespace cpm {
 #endif
             return *this;
         }
-
+        __host__ __device__ void clamp_min(float max_value) {
+            x = fminf(x, max_value);
+            y = fminf(y, max_value);
+            z = fminf(z, max_value);
+        }
         __host__ __device__ inline bool operator==(const vec3& other) const {
             return x == other.x && y == other.y && z && other.z;
         }

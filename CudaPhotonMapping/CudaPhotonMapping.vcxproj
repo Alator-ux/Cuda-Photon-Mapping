@@ -155,7 +155,9 @@
   <ItemGroup>
     <CudaCompile Include="CudaOpenGLUtils.cu" />
     <CudaCompile Include="CudaRandom.cu" />
+    <CudaCompile Include="CudaUtils.cu" />
     <CudaCompile Include="Drawer.cu" />
+    <CudaCompile Include="Initializer.cu" />
     <CudaCompile Include="math_functions.cuh" />
     <CudaCompile Include="Model.cu" />
     <CudaCompile Include="PhotonMap.cu" />
@@ -166,6 +168,7 @@
     <CudaCompile Include="kernel.cu" />
     <CudaCompile Include="RandomTest.cu" />
     <CudaCompile Include="Ray.cu" />
+    <CudaCompile Include="RaytracePlanner.cu" />
     <CudaCompile Include="RayTraycingTest.cu" />
     <CudaCompile Include="StackTest.cu" />
     <CudaCompile Include="Test.cu" />
@@ -178,8 +181,11 @@
     <ClInclude Include="CudaOpenGLUtils.cuh" />
     <ClInclude Include="CudaRandom.cuh" />
     <ClInclude Include="CudaUtils.cuh" />
+    <ClInclude Include="CuOptStack.cuh" />
     <ClInclude Include="DeepLookStack.cuh" />
+    <ClInclude Include="Defines.cuh" />
     <ClInclude Include="FourTuple.cuh" />
+    <ClInclude Include="Initializer.cuh" />
     <ClInclude Include="MediumManager.cuh" />
     <ClInclude Include="Light.cuh" />
     <ClInclude Include="Material.cuh" />
@@ -195,7 +201,9 @@
     <ClInclude Include="PriorityQueue.cuh" />
     <ClInclude Include="Ray.cuh" />
     <ClInclude Include="Drawer.cuh" />
+    <ClInclude Include="RaytracePlanner.cuh" />
     <ClInclude Include="Raytracer.cuh" />
+    <ClInclude Include="RefractiveTable.cuh" />
     <ClInclude Include="RenderEnums.cuh" />
     <ClInclude Include="Scene.cuh" />
     <ClInclude Include="Sort.cuh" />

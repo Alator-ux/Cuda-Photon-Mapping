@@ -358,10 +358,10 @@ protected:
                 float dpn = calc_dpn(p->value.pos, np.pos, np.normal);
                 recur_values.push({ NPNode(p, dpn), loc_node.heap_ind });
                 printf("put %f ", dpn);
-                printf("rc size %d \n", recur_values.getSize());
+                printf("rc size %d \n", recur_values.get_size());
             }
             printf("prev stack clear debug print \n");
-            printf("npc size %d ", recur_values.getSize());
+            printf("npc size %d ", recur_values.get_size());
             while (!recur_values.isEmpty()) {
                 auto pair = recur_values.top();
                 recur_values.pop();

@@ -2,6 +2,8 @@
 #include "CudaUtils.cuh"
 #include "Scene.cuh"
 #include "MediumManager.cuh"
+#include "DeepLookStack.cuh"
+#include "RaytracePlanner.cuh"
 
 namespace {
     using namespace std;
@@ -14,10 +16,9 @@ public:
         Model* incident_model;
         IntersectionInfo() : normal(), intersection_point(), incident_model(nullptr) {}
     };
-private:
+private:   
     Scene scene;
-//    MediumManager* medium_manager;
-
+    RaytracePlanner ray_planner;
     __device__ bool find_intersection_v2(const cpm::Ray& ray, bool reverse_normal, 
         Model*& out_incident_model, cpm::vec3& out_normal, cpm::vec3& out_intersection_point) {
         // Length = 256*3
@@ -84,65 +85,32 @@ private:
         return true;
     }
 
-    /*__host__ __device__ bool find_intersection(const cpm::Ray& ray, bool reverse_normal, IntersectionInfo* intersection_info) {
-        float intersection = 0.f;
-        Model* out_incident_model = nullptr;
-        cpm::vec3 out_normal, out_intersection_point;
-        size_t ii0, ii1, ii2;
-
-        int models_number = scene.models_number;
-        Model* models = scene.models;
-        for (int i = 0; i < models_number; i++) {
-            Model* model = models + i;
-
-            float temp_inter;
-            size_t tii0, tii1, tii2;
-            cpm::vec3 tnormal;
-            bool succ = model->intersection(ray, false, temp_inter,
-                tii0, tii1, tii2, tnormal);
-            if (succ && (intersection == 0.f || temp_inter < intersection)) {
-                intersection = temp_inter;
-                ii0 = tii0;
-                ii1 = tii1;
-                ii2 = tii2;
-                out_incident_model = model;
-                out_normal = tnormal;
-            }
-        }
-        if (out_incident_model == nullptr) {
-            return false;
-        }
-        out_intersection_point = ray.origin + ray.direction * intersection;
-        if (reverse_normal && cpm::vec3::dot(ray.direction, out_normal) > 0) {
-            out_normal *= -1.f;
-        }
-
-        intersection_info->incident_model = out_incident_model;
-        intersection_info->intersection_point = out_intersection_point;
-        intersection_info->normal = out_normal;
-
-        return true;
-    }*/
-
-    __host__ __device__ cpm::vec3 render_trace(const cpm::Ray& ray, bool in_object, int depth) {
-        cpm::vec3 res(0.f);
-
-        const int max_depth = 1;
-
-        cpm::Ray current_ray = ray;
+//    __device__ float* mediums_stack;
+    __host__ __device__ cpm::vec3 render_trace(cpm::Ray current_ray, bool in_object, size_t stack_id) {
+        constexpr int max_depth = 4;
+        int new_depth = 0;
+        int current_depth = -1;
         cpm::vec3 accumulated_color(0.f);
-        cpm::vec3 coef_after_reflection(1.f);
-        for (int current_depth = 0; current_depth < max_depth; current_depth++) {
+        cpm::vec3 new_ray_coef(1.f);
+        if (stack_id == 2272) {
+            printf("a");
+        }
+        bool replace_medium = false;
+        while ((current_depth < max_depth && current_depth != new_depth)
+                || ray_planner.pop_refraction(stack_id, replace_medium, current_ray, new_depth, new_ray_coef, in_object)) {
+
+            current_depth = new_depth;
+            
             cpm::vec3 normal, inter_p;
             Model* imodel;
-
             if (!find_intersection(current_ray, in_object, imodel, normal, inter_p)) {
-                break;
+                continue;
             }
 
+            cpm::vec3 current_color(0.f);
             Material mat = *imodel->get_material();
 
-            if (!mat.diffuse.is_zero()) {
+            if (!in_object && !mat.diffuse.is_zero()) {
                 cpm::vec3 re(0.f);
                 int important_ls = 0;
                 cpm::vec3 tnormal, tinter_p;
@@ -155,7 +123,7 @@ private:
                     const LightSource* ls = light_sources + i;
                     tray.origin = ls->position;
                     tray.direction = cpm::vec3::normalize(inter_p - ls->position); // point <- ls
-                    tray.origin += tray.direction * 0.001f; 
+                    tray.origin += tray.direction * 0.001f;
                     if (find_intersection(tray, in_object, timodel, tnormal, tinter_p) && inter_p.equal(tinter_p)) {
                         important_ls++;
                         re += max(cpm::vec3::dot(normal, -tray.direction), 0.f);
@@ -165,22 +133,41 @@ private:
                 re /= important_ls == 0 ? 1 : important_ls;
                 auto di_op = mat.diffuse * mat.opaque;
 
-                accumulated_color += re * di_op * coef_after_reflection;
+                re *= di_op;
+                current_color += re;
             }
 
-            accumulated_color += mat.emission * coef_after_reflection;
+            current_color += mat.emission;
 
-            if (!in_object && !mat.specular.is_zero()) {
+            current_color.clamp_min(1.f);
+            accumulated_color += current_color * new_ray_coef;
+
+            if (mat.opaque < 1.f && current_depth != max_depth - 1) {
+                int model_id = imodel->get_id();
+                cpm::Tuple3<float, float, bool> prev_new_refr_ind = ray_planner.get_refractive_indices(
+                    stack_id, model_id, mat.refr_index);
+                cpm::Ray nray;
+                bool succ = current_ray.refract(inter_p, normal,
+                    prev_new_refr_ind.item1, prev_new_refr_ind.item2, nray);
+                if (succ) {
+                    ray_planner.push_refraction(stack_id, replace_medium,
+                        nray, current_depth, new_ray_coef,
+                        model_id, mat.refr_index, mat.opaque, prev_new_refr_ind.item3);
+                }
+            }
+
+            if (!in_object && !mat.specular.is_zero() && current_depth != max_depth - 1) {
                 cpm::Ray nray = current_ray.reflect(inter_p, normal);
-                float coef = pow(max(cpm::vec3::dot(nray.direction, -current_ray.direction), 0.0f), mat.shininess);
-             
-                coef_after_reflection *= mat.specular * mat.opaque * coef;
+                float coef = powf(fmaxf(cpm::vec3::dot(nray.direction, -current_ray.direction), 0.0f), mat.shininess);
+
+                new_ray_coef *= mat.specular * mat.opaque * coef;
                 current_ray = nray;
+                new_depth = current_depth + 1;
             }
         }
-
-        res = accumulated_color;
-        return res;
+        
+        accumulated_color.clamp_min(1.f);
+        return accumulated_color;
     }
 
    public:
@@ -200,10 +187,7 @@ private:
         
         int local_id = threadIdx.x;
 
-        cpm::vec3 origin = scene.camera.position;
-
-        cpm::vec3 dir = scene.camera.generate_ray_direction(x, y);
-        cpm::Ray ray(origin, dir);
+        cpm::Ray ray(scene.camera.position, scene.camera.generate_ray_direction(x, y));
 
         /*Model* m;
         cpm::vec3 t1, t2;
@@ -230,8 +214,11 @@ private:
             }
         }*/
 
-        //find_intersection(ray, false, intersection_infos + local_id);
-        cpm::vec3 pixel_color = render_trace(ray, false, 0);
+        //find_intersection(ray, false, intersection_infos + local_id
+        cpm::vec3 pixel_color = render_trace(ray, false, id);
+        if (ray_planner.isNotEmpty(id)) {
+            Printer().s("Stack with id ").i(id).s(" is not empty").nl();
+        }
         canvas[id] = make_uchar3(pixel_color.x * 255, pixel_color.y * 255, pixel_color.z * 255);
     }
 
@@ -244,8 +231,9 @@ private:
             for (int i = 0; i < width; i++) {
                 cpm::vec3 dir = scene.camera.generate_ray_direction(i, j);
                 cpm::Ray ray(origin, dir);
-                cpm::vec3 pixel_color = render_trace(ray, false, 0);
-                canvas[i + j * width] = make_uchar3(pixel_color.x * 255, pixel_color.y * 255, pixel_color.z * 255);
+                size_t id = i + j * width;
+                cpm::vec3 pixel_color = render_trace(ray, false, id);
+                canvas[id] = make_uchar3(pixel_color.x * 255, pixel_color.y * 255, pixel_color.z * 255);
             }
             if (j % ((size_t)height / 50) == 0) {
                 std::cout << "\tPixels filled: " << (j + 1) * width << " of " << width * height << std::endl;
@@ -253,7 +241,17 @@ private:
         }
         std::cout << "Rendering has ended" << std::endl;
     }
-    void set_scene(Scene* scene) {
+    __host__ __device__ void set_scene(Scene* scene) {
         this->scene = *scene;
+    }
+
+    __host__ __device__ void set_planner(RaytracePlanner* planner) {
+        this->ray_planner = *planner;
+    }
+
+    __host__ void initialize_cpu(size_t pixels_number) {
+        constexpr int max_depth = 10;
+
+        ray_planner.intialize_cpu(max_depth, pixels_number);
     }
 };

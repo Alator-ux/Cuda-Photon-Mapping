@@ -1,4 +1,5 @@
 #include "Test.cuh"
+#include "Defines.cuh"
 
 __device__ cpm::vec3 color(const cpm::Ray ray) {
 	float t = 0.5f * (ray.direction.y + 1.f);

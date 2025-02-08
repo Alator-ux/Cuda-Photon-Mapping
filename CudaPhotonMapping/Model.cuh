@@ -17,10 +17,55 @@ namespace {
     constexpr float model_eps = 1e-6;
     template<typename t>
     t atomicAdd(t* source, t add_value);
+}
 
+class Model {
+public:
+	ModelConstructInfo mci;
+	int id;
+
+	__host__ __device__ float calculate_triangle_area(const cpm::vec2& v0, const cpm::vec2& v1, const cpm::vec2& v2) const
+    {
+        return 0.5f * abs((v1.x() - v0.x()) * (v2.y() - v0.y()) - (v2.x() - v0.x()) * (v1.y() - v0.y()));
+    }
+
+    __host__ __device__ cpm::vec3 barycentric_coords(const cpm::vec2& st, size_t ii0, size_t ii1, size_t ii2) const {
+        auto& st0 = mci.texcoords[ii0];
+        auto& st1 = mci.texcoords[ii1];
+        auto& st2 = mci.texcoords[ii2];
+
+        return barycentric_coords(st, st0, st1, st2);
+    }
+
+    __host__ __device__ cpm::vec3 barycentric_coords(const cpm::vec2& st, cpm::vec2& st0, cpm::vec2& st1, cpm::vec2& st2) const {
+        float areaABC = calculate_triangle_area(st0, st1, st2);
+
+        float areaPBC = calculate_triangle_area(st, st1, st2);
+        float areaPCA = calculate_triangle_area(st0, st, st2);
+        float areaPAB = calculate_triangle_area(st0, st1, st);
+
+        // Calculate the barycentric coordinates using the areas of the sub-triangles
+        float barycentricA = areaPBC / areaABC;
+        float barycentricB = areaPCA / areaABC;
+        float barycentricC = areaPAB / areaABC;
+
+        return cpm::vec3(barycentricA, barycentricB, barycentricC);
+    }
+
+    __host__ __device__ bool is_st_in_triangle(const cpm::vec2& st, size_t ii0, size_t ii1, size_t ii2, cpm::vec3& out_uvw) const {
+        out_uvw = barycentric_coords(st, ii0, ii1, ii2);
+        bool result = out_uvw.x >= 0.0f && out_uvw.y >= 0.0f && out_uvw.z >= 0.0f;
+        out_uvw.normalize();
+        return result;
+    }
+
+    /* floats operation:
+    *  86 + some index operations!!!!
+    *  86 * 2188 * (100*100) = 1.882 לכנה
+    */
     __host__ __device__ bool traingle_intersection(const cpm::Ray& ray, bool in_object,
         const cpm::vec3& v0, const cpm::vec3& v1, const cpm::vec3& v2,
-        float& out_ray_parameter, cpm::vec3& out_uvw) {
+        float& out_ray_parameter, cpm::vec3& out_uvw) const {
         out_ray_parameter = 0.f;
         // compute the plane's normal
         cpm::vec3 first_direction = v1 - v0;
@@ -70,137 +115,7 @@ namespace {
         out_uvw.z = w;
         return true; // this ray hits the triangle
     }
-
-    __host__ __device__  void  traingle_intersection(const cpm::Ray& ray, bool in_object, 
-        const cpm::vec3* positions, size_t& i, 
-        float& intersection, cpm::vec3& uvw, size_t& ii0, size_t& ii1, size_t& ii2) {
-        float possible_ray_parameter;
-        cpm::vec3 possible_uvw;
-
-        cpm::vec3 v0 = positions[i];
-        cpm::vec3 v1 = positions[i + 1];
-        cpm::vec3 v2 = positions[i + 2];
-
-        bool intersection_found = traingle_intersection(ray, in_object,
-            v0, v1, v2,
-            possible_ray_parameter, possible_uvw);
-        if (intersection_found && possible_ray_parameter < intersection) {
-            intersection = possible_ray_parameter;
-            uvw = possible_uvw;
-            ii0 = i;
-            ii1 = i + 1;
-            ii2 = i + 2;
-        }
-        i += 3;
-    }
-
-    typedef void (*IntersectionFunc)(const cpm::Ray& ray, bool in_object,
-        const cpm::vec3* positions, size_t& i,
-        float& intersection, cpm::vec3& uvw, size_t& ii0, size_t& ii1, size_t& ii2);
-
-    __constant__ IntersectionFunc intersection_funcs[] = {
-        &traingle_intersection
-    };
-}
-
-class Model {
-public:
-	ModelConstructInfo mci;
-	int id;
-
-	__host__ __device__ float calculate_triangle_area(const cpm::vec2& v0, const cpm::vec2& v1, const cpm::vec2& v2) const
-    {
-        return 0.5f * abs((v1.x() - v0.x()) * (v2.y() - v0.y()) - (v2.x() - v0.x()) * (v1.y() - v0.y()));
-    }
-
-    __host__ __device__ cpm::vec3 barycentric_coords(const cpm::vec2& st, size_t ii0, size_t ii1, size_t ii2) const {
-        auto& st0 = mci.texcoords[ii0];
-        auto& st1 = mci.texcoords[ii1];
-        auto& st2 = mci.texcoords[ii2];
-
-        return barycentric_coords(st, st0, st1, st2);
-    }
-
-    __host__ __device__ cpm::vec3 barycentric_coords(const cpm::vec2& st, cpm::vec2& st0, cpm::vec2& st1, cpm::vec2& st2) const {
-        float areaABC = calculate_triangle_area(st0, st1, st2);
-
-        float areaPBC = calculate_triangle_area(st, st1, st2);
-        float areaPCA = calculate_triangle_area(st0, st, st2);
-        float areaPAB = calculate_triangle_area(st0, st1, st);
-
-        // Calculate the barycentric coordinates using the areas of the sub-triangles
-        float barycentricA = areaPBC / areaABC;
-        float barycentricB = areaPCA / areaABC;
-        float barycentricC = areaPAB / areaABC;
-
-        return cpm::vec3(barycentricA, barycentricB, barycentricC);
-    }
-
-    __host__ __device__ bool is_st_in_triangle(const cpm::vec2& st, size_t ii0, size_t ii1, size_t ii2, cpm::vec3& out_uvw) const {
-        out_uvw = barycentric_coords(st, ii0, ii1, ii2);
-        bool result = out_uvw.x >= 0.0f && out_uvw.y >= 0.0f && out_uvw.z >= 0.0f;
-        out_uvw.normalize();
-        return result;
-    }
-
-    //__host__ __device__ bool traingle_intersection(const cpm::Ray& ray, bool in_object,
-    //    const cpm::vec3& v0, const cpm::vec3& v1, const cpm::vec3& v2,
-    //    float& out_ray_parameter, cpm::vec3& out_uvw) const {
-    //    out_ray_parameter = 0.f;
-    //    // compute the plane's normal
-    //    cpm::vec3 v0v1 = v1 - v0;
-    //    cpm::vec3 v0v2 = v2 - v0;
-    //    // no need to normalize
-    //    cpm::vec3 N = cpm::vec3::cross(v0v1, v0v2); // Normal of the triangle plane
-    //    float denom = cpm::vec3::dot(N, N);
-
-    //    // Step 1: finding P
-
-    //    // check if the ray and plane are parallel.
-    //    float NdotRayDirection = cpm::vec3::dot(N, ray.direction);
-    //    if (fabsf(NdotRayDirection) < model_eps) // almost 0
-    //        return false; // they are parallel so they don't intersect! 
-
-    //    // compute t (equation 3)
-    //    out_ray_parameter = (cpm::vec3::dot(N, v0) - cpm::vec3::dot(N, ray.origin)) / NdotRayDirection;
-    //    // check if the triangle is behind the ray
-    //    if (out_ray_parameter < 0) return false; // the triangle is behind
-
-    //    // compute the intersection point using equation 1
-    //    cpm::vec3 P = ray.origin + out_ray_parameter * ray.direction;
-
-    //    // Step 2: inside-outside test
-    //    cpm::vec3 C; // vector perpendicular to triangle's plane
-
-    //    // edge 0
-    //    cpm::vec3 edge0 = v1 - v0;
-    //    cpm::vec3 vp0 = P - v0;
-    //    C = cpm::vec3::cross(edge0, vp0);
-    //    float w = cpm::vec3::dot(N, C);
-    //    if (w < 0) return false; // P is on the right side
-
-    //    // edge 2
-    //    cpm::vec3 edge2 = v0 - v2;
-    //    cpm::vec3 vp2 = P - v2;
-    //    C = cpm::vec3::cross(edge2, vp2);
-    //    float v = cpm::vec3::dot(N, C);
-    //    if (v < 0) return false; // P is on the right side;
-    //    w /= denom;
-    //    v /= denom;
-    //    float u = 1.f - v - w;
-    //    if (u < 0) {
-    //        return false;
-    //    }
-    //    out_uvw.x = u;
-    //    out_uvw.y = v;
-    //    out_uvw.z = w;
-    //    return true; // this ray hits the triangle
-    //}
-
-    /* floats operation:
-    *  86 + some index operations!!!!
-    *  86 * 2188 * (100*100) = 1.882 לכנה
-    */
+  
     
 
 public:
@@ -233,7 +148,7 @@ public:
     __host__ __device__ int get_id() const {
         return id;
     }
-    __host__ __device__ Tuple3<cpm::vec3> get_bounding_box() const {
+    __host__ __device__ cpm::Tuple3<cpm::vec3, cpm::vec3, cpm::vec3> get_bounding_box() const {
         cpm::vec3 right_upper(mci.positions[0]), left_lower(mci.positions[0]), normal(0.f);
         for (int i = 0; i < mci.size; i++) {
             auto position = mci.positions[i];
@@ -439,83 +354,65 @@ public:
 
         return true;
     }
-    //#ifdef __CUDA_ARCH__
-//                cpm::vec3 v0(tex1Dfetch<float4>(mci.positions_texture, i));
-//                cpm::vec3 v1(tex1Dfetch<float4>(mci.positions_texture, i + 1));
-//                cpm::vec3 v2(tex1Dfetch<float4>(mci.positions_texture, i + 2));
-//#else
-//                cpm::vec3 v0 = mci.positions[i];
-//                cpm::vec3 v1 = mci.positions[i + 1];
-//                cpm::vec3 v2 = mci.positions[i + 2];
-//#endif
-    __host__ __device__ bool intersection(const cpm::Ray& ray, bool in_object, float& intersection,
+   
+    __host__ __device__ bool intersection(const cpm::Ray& ray, bool in_object, float& intersection, 
         cpm::vec3& out_normal) const {
         intersection = FLT_MAX;
-        size_t ii0, ii1, ii2;
-        ii0 = ii1 = ii2 = 0;
+        size_t ii0 = 0;
+        size_t ii1 = 0;
+        size_t ii2 = 0;
         cpm::vec3 uvw;
         size_t i = 0;
-        bool intersection_found = true;
+        bool intersection_found;
         int primitive_index = 0;
-        ModelType model_type = mci.type;
         while (primitive_index < mci.primitives_size) {
             float possible_ray_parameter = 0.f;
             cpm::vec3 possible_uvw;
-            int ind0, ind1, ind2, ind_addition;
             if (mci.type == ModelType::Triangle) {
-                ind0 = 0;
-                ind1 = 1;
-                ind2 = 2;
-                ind_addition = 3;
+                cpm::vec3 v0 = mci.positions[i];
+                cpm::vec3 v1 = mci.positions[i + 1];
+                cpm::vec3 v2 = mci.positions[i + 2];
+                intersection_found = traingle_intersection(ray, in_object,
+                    v0, v1, v2,
+                    possible_ray_parameter, possible_uvw);
+                if (intersection_found && possible_ray_parameter < intersection) {
+                    intersection = possible_ray_parameter;
+                    uvw = possible_uvw;
+                    ii0 = i;
+                    ii1 = i + 1;
+                    ii2 = i + 2;
+                }
+                i += 3;
             }
             else if (mci.type == ModelType::Quad) {
-                ind_addition = 4;
-                if (intersection_found) {
-                    ind0 = 0;
-                    ind1 = 1;
-                    ind2 = 3;
+                intersection_found = traingle_intersection(ray, in_object,
+                    mci.positions[i], mci.positions[i + 1], mci.positions[i + 3],
+                    possible_ray_parameter, possible_uvw);
+                if (intersection_found && possible_ray_parameter < intersection) {
+                    intersection = possible_ray_parameter;
+                    uvw = possible_uvw;
+                    ii0 = i;
+                    ii1 = i + 1;
+                    ii2 = i + 3;
                 }
                 else {
-                    ind0 = 1;
-                    ind1 = 2;
-                    ind2 = 3;
+                    possible_ray_parameter = 0.f;
+                    intersection_found = traingle_intersection(ray, in_object,
+                        mci.positions[i + 1], mci.positions[i + 2], mci.positions[i + 3],
+                        possible_ray_parameter, possible_uvw);
+                    if (intersection_found && possible_ray_parameter < intersection) {
+                        intersection = possible_ray_parameter;
+                        uvw = possible_uvw;
+                        ii0 = i + 1;
+                        ii1 = i + 2;
+                        ii2 = i + 3;
+                    }
                 }
+                i += 4;
             }
             else {
                 printf("Unknown model vertex organization\n");
             }
-            cpm::vec3 v0 = mci.positions[i + ind0];
-            cpm::vec3 v1 = mci.positions[i + ind1];
-            cpm::vec3 v2 = mci.positions[i + ind2];
-            intersection_found = traingle_intersection(ray, in_object,
-                v0, v1, v2,
-                possible_ray_parameter, possible_uvw);
-            if (intersection_found && possible_ray_parameter < intersection) {
-                intersection = possible_ray_parameter;
-                uvw = possible_uvw;
-                ii0 = i + ind0;
-                ii1 = i + ind1;
-                ii2 = i + ind2;
-            }
-            i += ind_addition
-                    - ind_addition * (int)(mci.type == ModelType::Quad && !intersection_found && ind0 % 4 == 0);
-            //if (mci.type == ModelType::Triangle) {
-            //    i += 3;
-            //}
-            //else if (mci.type == ModelType::Quad) {
-            //    // origin expression in text:
-            //    //      if (first triangle checked and intersection found) or (second triangle checked)
-            //    //          i += 4;
-            //    // Let's define
-            //    // x = i % 4 == 0 // is first triangle checked 
-            //    // y = intersection_found
-            //    // boolean expression:
-            //    //      x && y || !x = !x || y;
-            //    if (i % 4 != 0 || intersection_found) {
-            //        i += 4;
-            //    }
-            //}
-            
             primitive_index++;
         }
         // Return false if no intersection was found (ii2 was not updated)

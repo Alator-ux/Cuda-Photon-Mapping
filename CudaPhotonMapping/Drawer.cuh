@@ -19,7 +19,7 @@ class Drawer {
 
 	void draw_in_gpu(int frame);
 	void draw_in_cpu(int frame);
-
+	void initialize_raytracer();
 public:
 	Drawer() : gpu_canvas(nullptr), cpu_canvas(nullptr), cuda_resource(nullptr), width(0), height(0) {}
 	Drawer(const Drawer& other) : 
@@ -33,7 +33,7 @@ public:
 		cpu_raytracer((Raytracer*)malloc(sizeof(Raytracer))),
 		timer()
 	{
-		cudaMalloc(&gpu_raytracer, sizeof(Raytracer));
+		initialize_raytracer();
 	}
 
 	Drawer& operator=(const Drawer& other);

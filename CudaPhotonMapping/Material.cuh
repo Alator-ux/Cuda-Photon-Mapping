@@ -15,6 +15,7 @@ struct Material {
         this->diffuse = other.diffuse;
         this->specular = other.specular;
         this->emission = other.emission;
+        this->refr_index = other.refr_index;
         this->opaque = other.opaque;
         this->shininess = other.shininess;
     }

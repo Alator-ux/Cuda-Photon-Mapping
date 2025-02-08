@@ -1,5 +1,6 @@
 #include "CudaRandom.cuh"
 #include "CudaUtils.cuh"
+#include "Defines.cuh"
 
 namespace cpm {
 	__global__ void setup_curand(curandState* states, int size) {

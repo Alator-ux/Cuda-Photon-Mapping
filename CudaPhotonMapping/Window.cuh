@@ -58,7 +58,7 @@ class Window {
 		unsigned int size_bytes = width * height * sizeof(uchar3);
 
 		/*create_pbo(&this->pbo, &this->cuda_resource, size_bytes, cudaGraphicsMapFlagsWriteDiscard);*/
-		create_pbo(&this->pbo, &this->cuda_resource, size_bytes, cudaGraphicsMapFlagsNone);
+		create_pbo(&this->pbo, &this->cuda_resource, size_bytes, cudaGraphicsMapFlagsWriteDiscard);
 
 		drawer = Drawer(cuda_resource, width, height, render_mode);
 	}

@@ -1,6 +1,7 @@
 #include "ModelConstructInfo.cuh"
 #include "CudaUtils.cuh"
 #include <typeinfo>
+#include "Defines.cuh"
 
 int model_type_to_primitive_size(ModelType type){
     int size = -1;
