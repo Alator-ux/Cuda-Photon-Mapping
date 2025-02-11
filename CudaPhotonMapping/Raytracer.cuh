@@ -85,7 +85,6 @@ private:
         return true;
     }
 
-//    __device__ float* mediums_stack;
     __host__ __device__ cpm::vec3 render_trace(cpm::Ray current_ray, bool in_object, size_t stack_id) {
         int new_depth = 0;
         int current_depth = -1;
@@ -93,6 +92,9 @@ private:
         cpm::vec3 new_ray_coef(1.f);
         if (stack_id == 2272) {
             printf("a");
+        }
+        if (stack_id == 3156) {
+            printf("b");
         }
         bool replace_medium = false;
         while ((current_depth < GlobalParams::max_depth() && current_depth != new_depth)
@@ -248,9 +250,7 @@ private:
         this->ray_planner = *planner;
     }
 
-    __host__ void initialize_cpu(size_t pixels_number) {
-        constexpr int max_depth = 10;
-
-        ray_planner.intialize_cpu(max_depth, pixels_number);
+    __host__ void initialize_cpu(size_t pixels_number, int max_depth, int max_medium_depth) {
+        ray_planner.intialize_cpu(pixels_number, max_depth, max_medium_depth);
     }
 };

@@ -17,9 +17,8 @@ private:
 	MediumManager* medium_managers = nullptr;
 	cpm::stack<RayPlan>* planner = nullptr;
 public:
-	__host__ void intialize_cpu(int max_depth, size_t array_size) {
-		this->array_size = array_size;
-		int stack_size = max_depth;
+	__host__ void intialize_cpu(size_t pixels_number, int max_depth, int max_medium_depth) {
+		this->array_size = pixels_number;
 		/* 786 432 (pixels)
 		*		cpm::stack<RayPlan> planner
 		*		4 + 4 (size, capacity) + 4 (pointer) + 8 (stack capacity) * (6 * 4 (ray) + 4 (depth) + 3 * 4 (coef)) = 332
@@ -51,16 +50,16 @@ public:
 		planner = new cpm::stack<RayPlan>[array_size];
 		medium_managers = new MediumManager[array_size];
 		for (size_t i = 0; i < array_size; i++) {
-			planner[i].initialize(stack_size);
-			medium_managers[i].intialize(stack_size, 1.f);
+			planner[i].initialize(max_depth);
+			medium_managers[i].intialize(max_depth, max_medium_depth, 1.f);
 		}
 		
 	}
 	__device__ void _initialize_device(cpm::stack<RaytracePlanner::RayPlan>* planner, MediumManager* medium_managers, size_t array_size);
 	__device__ void _initialize_device_data(cpm::stack<RaytracePlanner::RayPlan>* planner, RaytracePlanner::RayPlan* planner_data,
 		MMInnerContainer* medium_manager_inner_container, MMInnerData* medium_manager_innder_data,
-		MediumManager* medium_managers, size_t array_size, size_t stack_cap);
-	static __host__ RaytracePlanner* initialize_gpu(size_t array_size, int stack_cap, float default_refractive_index);
+		MediumManager* medium_managers, size_t array_size, int max_depth, int max_medium_depth);
+	static __host__ RaytracePlanner* initialize_gpu(size_t array_size, int max_depth, int max_medium_depth, float default_refr_index);
 
 	__host__ __device__ RaytracePlanner& operator=(const RaytracePlanner& other)
 	{

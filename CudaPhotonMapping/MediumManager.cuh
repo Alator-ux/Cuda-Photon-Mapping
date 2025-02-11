@@ -28,9 +28,9 @@ public:
 
     MediumManager(int stack_capacity) :  mediums_stack(stack_capacity) {}
 
-    __host__ __device__ void intialize(int stack_capacity, unsigned int default_inside_level) {
+    __host__ __device__ void intialize(int max_depth, int max_medium_depth, unsigned int default_inside_level) {
         
-        mediums_stack = MMOuterContainer(stack_capacity);
+        mediums_stack = MMOuterContainer(max_depth);
         auto mediums_data = mediums_stack.get_data();
 
         /* 4 (outer pointer) + 4 + 4 (size, capacity) + 8 (outer stack_capacity) * 
@@ -39,8 +39,8 @@ public:
         */
         /* 24 + 8 * (24 + 8 * 8) = 
         */
-        for (int i = 0; i < stack_capacity; i++) {
-            mediums_data[i] = cpm::DeepLookStack<MediumContent>(stack_capacity);
+        for (int i = 0; i < max_depth; i++) {
+            mediums_data[i] = MMInnerContainer(max_medium_depth);
         }
     }
     __host__ __device__ cpm::Tuple3<float, float, bool> get_refractive_indices(
@@ -55,7 +55,7 @@ public:
         if (medium.hit_id == model_id) {
             return { 
                 model_refractive_index, 
-                mediums_size == 1 ? GlobalParams::default_refractive_index() :
+                mediums.get_size() < 2 ? GlobalParams::default_refractive_index() :
                                     mediums.top(1).refractive_index,
                 false 
             };
@@ -73,7 +73,7 @@ public:
             mediums_stack.set_size(1);
         }
         else {
-            mediums_stack.push_copy(mediums_stack.top(), 1);
+            mediums_stack.push_copy(mediums_stack.top(), (GlobalParams::max_depth() + 1) / 2, 1);
         }
     }
     __host__ __device__ void reduce_depth() {
@@ -93,12 +93,11 @@ public:
         }
     }
     __host__ __device__ void set_data(MMInnerContainer* medium_manager_inner_container, 
-        MMInnerData* medium_manager_innder_data, size_t stack_cap) {
-        mediums_stack.set_data(medium_manager_inner_container, stack_cap);
+        MMInnerData* medium_manager_innder_data, int max_depth, int max_medium_depth) {
+        mediums_stack.set_data(medium_manager_inner_container, max_depth);
 
-        for (size_t i = 0; i < stack_cap; i++) {
-            medium_manager_inner_container[i].set_data(medium_manager_innder_data + stack_cap * i, stack_cap);
+        for (size_t i = 0; i < max_medium_depth; i++) {
+            medium_manager_inner_container[i].set_data(medium_manager_innder_data + max_medium_depth * i, max_medium_depth);
         }
     }
-
 };

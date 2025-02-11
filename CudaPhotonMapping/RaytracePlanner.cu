@@ -4,12 +4,12 @@
 
 __device__ void RaytracePlanner::_initialize_device_data(cpm::stack<RaytracePlanner::RayPlan>* planner, RaytracePlanner::RayPlan* planner_data,
 	MMInnerContainer* medium_manager_inner_container, MMInnerData* medium_manager_innder_data,
-	MediumManager* medium_managers, size_t array_size, size_t stack_cap) {
+	MediumManager* medium_managers, size_t array_size, int max_depth, int max_medium_depth) {
 	uint id = blockIdx.x * blockDim.x + threadIdx.x;
 
-	this->planner[id].set_data(planner_data + stack_cap * id, stack_cap);
-	this->medium_managers[id].set_data(medium_manager_inner_container + stack_cap * id,
-		medium_manager_innder_data + stack_cap * stack_cap * id, stack_cap);
+	this->planner[id].set_data(planner_data + max_depth * id, max_depth);
+	this->medium_managers[id].set_data(medium_manager_inner_container + max_depth * id,
+		medium_manager_innder_data + max_depth * max_medium_depth * id, max_depth, max_medium_depth);
 	
 }
 
@@ -17,14 +17,14 @@ __global__ void initialize_ray_planner_data_kernel(RaytracePlanner* ray_planner,
 	cpm::stack<RaytracePlanner::RayPlan>* planner, RaytracePlanner::RayPlan* planner_data,
 	MMInnerContainer* medium_manager_inner_container, MMInnerData* medium_manager_innder_data,
 	MediumManager* medium_managers,
-	size_t array_size, size_t stack_cap) {
+	size_t array_size, int max_depth, int max_medium_depth) {
 
 	uint id = blockIdx.x * blockDim.x + threadIdx.x;
 	if (id >= array_size) {
 		return;
 	}
 	ray_planner->_initialize_device_data(planner, planner_data, medium_manager_inner_container, medium_manager_innder_data,
-		medium_managers, array_size, stack_cap);
+		medium_managers, array_size, max_depth, max_medium_depth);
 }
 
 __device__ void RaytracePlanner::_initialize_device(cpm::stack<RaytracePlanner::RayPlan>*planner, MediumManager * medium_managers, size_t array_size) {
@@ -39,7 +39,7 @@ __global__ void initialize_ray_planner_kernel(RaytracePlanner* ray_planner,
 	ray_planner->_initialize_device(planner, medium_managers, array_size);
 }
 
-__host__ RaytracePlanner* RaytracePlanner::initialize_gpu(size_t array_size, int stack_cap, float default_refr_index) {
+__host__ RaytracePlanner* RaytracePlanner::initialize_gpu(size_t array_size, int max_depth, int max_medium_depth, float default_refr_index) {
 	size_t size = array_size;
 
 	MediumManager* medium_managers;
@@ -48,7 +48,7 @@ __host__ RaytracePlanner* RaytracePlanner::initialize_gpu(size_t array_size, int
 	cpm::stack<RayPlan>* planner;
 	cudaMalloc(&planner, sizeof(cpm::stack<RayPlan>) * size);
 
-	size *= stack_cap;
+	size *= max_depth;
 	RayPlan* planner_data;
 	cudaMalloc(&planner_data, sizeof(RayPlan) * size);
 	
@@ -57,7 +57,7 @@ __host__ RaytracePlanner* RaytracePlanner::initialize_gpu(size_t array_size, int
 	cudaMalloc(&medium_manager_inner_container, sizeof(MMInnerContainer) * size);
 	
 	//size *= stack_cap + 1;
-	size *= stack_cap;
+	size *= max_medium_depth;
 	MMInnerData* medium_manager_innder_data;
 	cudaMalloc(&medium_manager_innder_data, sizeof(MMInnerData) * size);
 	
@@ -74,7 +74,7 @@ __host__ RaytracePlanner* RaytracePlanner::initialize_gpu(size_t array_size, int
 		planner, planner_data, 
 		medium_manager_inner_container, medium_manager_innder_data,
 		medium_managers, 
-		array_size, stack_cap);
+		array_size, max_depth, max_medium_depth);
 	CudaSynchronizer::synchronize_with_instance();
 	checkCudaErrors(cudaGetLastError());
 

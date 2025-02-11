@@ -48,19 +48,21 @@ namespace cpm {
             data = (ElemType*)malloc(new_capacity * sizeof(ElemType));
             capacity = new_capacity;
         }
-        __host__ __device__ void copy(const cpm::stack<ElemType> other, int copy_top_offset) {
+        __host__ __device__ void copy(const cpm::stack<ElemType> other, int count_from_top, int offset_from_top) {
             if (this->get_capacity() != other.get_capacity()) {
                 Printer::stack_error("this capacity != other capacity when copy");
                 return;
             }
-            for (int i = 0; i < other.size - copy_top_offset; i++) {
+            int to = other.size - offset_from_top;
+            int from = max(to - count_from_top, 0);
+            for (int i = from; i < to; i++) {
                 this->data[i] = other.data[i];
             }
         }
-        __host__ __device__ void push_copy(ElemType value, int copy_top_offset = 0) {
+        __host__ __device__ void push_copy(ElemType value, int count_from_top = 1, int offset_from_top = 0) {
 #ifdef __CUDA_ARCH__
             if (!isFull()) {
-                data[size].copy(value, copy_top_offset);
+                data[size].copy(value, count_from_top, offset_from_top);
                 size++;
             }
             else {
@@ -70,7 +72,7 @@ namespace cpm {
             if (isFull()) {
                 resize();
             }
-            data[size].copy(value, copy_top_offset);
+            data[size].copy(value, count_from_top, offset_from_top);
             size++;
 #endif
         }

@@ -26,7 +26,6 @@
     <CudaCompile Include="CudaOpenGLUtils.cu">
       <Filter>Tools\CudaOpenGLUtils</Filter>
     </CudaCompile>
-    <CudaCompile Include="Initializer.cu" />
     <CudaCompile Include="RaytracePlanner.cu">
       <Filter>Tracing</Filter>
     </CudaCompile>
@@ -35,6 +34,9 @@
     </CudaCompile>
     <CudaCompile Include="GlobalParams.cu">
       <Filter>Global</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Initializer.cu">
+      <Filter>Initilization</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>
@@ -137,7 +139,6 @@
     <ClInclude Include="Timer.cuh">
       <Filter>Tools</Filter>
     </ClInclude>
-    <ClInclude Include="Initializer.cuh" />
     <ClInclude Include="RefractiveTable.cuh" />
     <ClInclude Include="CuOptStack.cuh">
       <Filter>DataStructures</Filter>
@@ -156,6 +157,9 @@
     </ClInclude>
     <ClInclude Include="GlobalParams.cuh">
       <Filter>Global</Filter>
+    </ClInclude>
+    <ClInclude Include="Initializer.cuh">
+      <Filter>Initilization</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -215,6 +219,9 @@
     </Filter>
     <Filter Include="Global">
       <UniqueIdentifier>{d5d16cbe-d603-47da-89d6-b9b52a8ad04f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Initilization">
+      <UniqueIdentifier>{bfab3b33-a6c0-4b91-8c07-28dc5482b844}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

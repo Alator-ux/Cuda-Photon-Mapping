@@ -1,8 +1,6 @@
 #include "Drawer.cuh"
 #include "Defines.cuh"
 
-#define THREADS_NUMBER 256
-
 __global__ void compute(uchar3* canvas, int width, int height, int frame) {
 	/*int x = blockIdx.x * blockDim.x + threadIdx.x;
 	int y = blockIdx.y * blockDim.y + threadIdx.y;
@@ -32,7 +30,7 @@ void Drawer::draw_in_gpu(int frame) {
 	int blocks = (width * height + threads - 1) / threads;
 	int shared_memory = threads * sizeof(cpm::vec3*) * 3;
 	timer.startCUDA();
-	//compute << <grid, block >> > (gpu_canvas, width, height, frame);
+	//compute << <blocks, threads >> > (gpu_canvas, width, height, frame);
 	gpu_kernel << <blocks, threads, shared_memory >> > (gpu_canvas, gpu_raytracer, width, height);
 	timer.stopCUDA();
 	timer.printCUDA();
@@ -67,10 +65,13 @@ __global__ void gpu_initialize_kernel(Raytracer* raytracer, Scene* scene, Raytra
 
 void Drawer::initialize_raytracer() {
 	int size = width * height; // 786 432
-	cpu_raytracer->initialize_cpu(size);
+	int max_depth = GlobalParams::max_depth();
+	int max_medium_depth = (max_depth + 1) / 2;
+	
+	cpu_raytracer->initialize_cpu(size, max_depth, max_medium_depth);
 
 	cudaMalloc(&gpu_raytracer, sizeof(Raytracer));
-	auto gpu_planner = RaytracePlanner::initialize_gpu(size, GlobalParams::max_depth(), 1.f);
+	auto gpu_planner = RaytracePlanner::initialize_gpu(size, max_depth, max_medium_depth, 1.f);
 	
 	gpu_initialize_kernel << <1, 1 >> > (gpu_raytracer, nullptr, gpu_planner);
 	CudaSynchronizer::synchronize_with_instance();
