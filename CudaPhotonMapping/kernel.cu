@@ -8,14 +8,17 @@
 
 int main(int argc, char * argv[]) {
     setlocale(LC_ALL, "");
-    /*int width  = 1024;
-    int height = 768;*/
+    cudaSetDevice(0);
+    int width  = 1024;
+    int height = 768;
     /*int width = 2560;
     int height = 1080;*/
-    int width = 100;
-    int height = 100;
+   /* int width = 100;
+    int height = 100;*/
 
     Printer::cuda_properties();
+
+    initialize_global_params(3, 1.f);
 
     Camera camera(cpm::vec3(-0.00999999046, 0.795000017, 2.35000001), cpm::vec3(0.f, 0.f, -1.f), cpm::vec3(0.f, 1.f,0.f),
                   60, width, height); // TODO remove hardcode;

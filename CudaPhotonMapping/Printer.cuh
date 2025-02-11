@@ -28,7 +28,7 @@ struct Printer {
 		printf("Error in class Stack. Message: %s\n", error_content);
 	}
 
-	__host__ __device__ static void cuda_properties() {
+	__host__ static void cuda_properties() {
 		auto printer = Printer();
 
 		cudaDeviceProp cudaDeviceProp;

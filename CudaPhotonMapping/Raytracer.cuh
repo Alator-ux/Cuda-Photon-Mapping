@@ -87,7 +87,6 @@ private:
 
 //    __device__ float* mediums_stack;
     __host__ __device__ cpm::vec3 render_trace(cpm::Ray current_ray, bool in_object, size_t stack_id) {
-        constexpr int max_depth = 4;
         int new_depth = 0;
         int current_depth = -1;
         cpm::vec3 accumulated_color(0.f);
@@ -96,7 +95,7 @@ private:
             printf("a");
         }
         bool replace_medium = false;
-        while ((current_depth < max_depth && current_depth != new_depth)
+        while ((current_depth < GlobalParams::max_depth() && current_depth != new_depth)
                 || ray_planner.pop_refraction(stack_id, replace_medium, current_ray, new_depth, new_ray_coef, in_object)) {
 
             current_depth = new_depth;
@@ -142,7 +141,7 @@ private:
             current_color.clamp_min(1.f);
             accumulated_color += current_color * new_ray_coef;
 
-            if (mat.opaque < 1.f && current_depth != max_depth - 1) {
+            if (mat.opaque < 1.f && current_depth != GlobalParams::max_depth() - 1) {
                 int model_id = imodel->get_id();
                 cpm::Tuple3<float, float, bool> prev_new_refr_ind = ray_planner.get_refractive_indices(
                     stack_id, model_id, mat.refr_index);
@@ -156,7 +155,7 @@ private:
                 }
             }
 
-            if (!in_object && !mat.specular.is_zero() && current_depth != max_depth - 1) {
+            if (!in_object && !mat.specular.is_zero() && current_depth != GlobalParams::max_depth() - 1) {
                 cpm::Ray nray = current_ray.reflect(inter_p, normal);
                 float coef = powf(fmaxf(cpm::vec3::dot(nray.direction, -current_ray.direction), 0.0f), mat.shininess);
 

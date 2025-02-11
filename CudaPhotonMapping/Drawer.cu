@@ -70,7 +70,7 @@ void Drawer::initialize_raytracer() {
 	cpu_raytracer->initialize_cpu(size);
 
 	cudaMalloc(&gpu_raytracer, sizeof(Raytracer));
-	auto gpu_planner = RaytracePlanner::initialize_gpu(size, 4, 1.f);
+	auto gpu_planner = RaytracePlanner::initialize_gpu(size, GlobalParams::max_depth(), 1.f);
 	
 	gpu_initialize_kernel << <1, 1 >> > (gpu_raytracer, nullptr, gpu_planner);
 	CudaSynchronizer::synchronize_with_instance();

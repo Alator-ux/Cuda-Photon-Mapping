@@ -1,4 +1,7 @@
 #pragma once
+#include "CudaUtils.cuh"
+
+#define THREADS_NUMBER 256
 
 #define uint unsigned int
 

@@ -52,14 +52,14 @@ public:
 		medium_managers = new MediumManager[array_size];
 		for (size_t i = 0; i < array_size; i++) {
 			planner[i].initialize(stack_size);
-			medium_managers[i].intialize(stack_size, 1.f, 0);
+			medium_managers[i].intialize(stack_size, 1.f);
 		}
 		
 	}
 	__device__ void _initialize_device(cpm::stack<RaytracePlanner::RayPlan>* planner, MediumManager* medium_managers, size_t array_size);
 	__device__ void _initialize_device_data(cpm::stack<RaytracePlanner::RayPlan>* planner, RaytracePlanner::RayPlan* planner_data,
 		MMInnerContainer* medium_manager_inner_container, MMInnerData* medium_manager_innder_data,
-		MediumManager* medium_managers, size_t array_size, size_t stack_cap, float default_refractive_index);
+		MediumManager* medium_managers, size_t array_size, size_t stack_cap);
 	static __host__ RaytracePlanner* initialize_gpu(size_t array_size, int stack_cap, float default_refractive_index);
 
 	__host__ __device__ RaytracePlanner& operator=(const RaytracePlanner& other)

@@ -96,3 +96,8 @@ cpm::pair<Scene*, Scene*> initialize_scene(const std::string& path, const std::s
 
     return { cpu_scene, gpu_scene };
 }
+
+void initialize_global_params(int max_depth, float default_refractive_index) {
+    GlobalParams::set_max_depth(max_depth);
+    GlobalParams::set_default_refractive_index(default_refractive_index);
+}

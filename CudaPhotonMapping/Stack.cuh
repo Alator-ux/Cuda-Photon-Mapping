@@ -63,6 +63,9 @@ namespace cpm {
                 data[size].copy(value, copy_top_offset);
                 size++;
             }
+            else {
+                Printer::stack_error("stack is full, but tried to push");
+            }
 #else
             if (isFull()) {
                 resize();

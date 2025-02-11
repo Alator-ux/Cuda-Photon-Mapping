@@ -2,35 +2,11 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <CudaCompile Include="kernel.cu" />
-    <CudaCompile Include="PriorityQueueTest.cu">
-      <Filter>Tests</Filter>
-    </CudaCompile>
-    <CudaCompile Include="StackTest.cu">
-      <Filter>Tests</Filter>
-    </CudaCompile>
-    <CudaCompile Include="PhotonTest.cu">
-      <Filter>Tests</Filter>
-    </CudaCompile>
-    <CudaCompile Include="Test.cu">
-      <Filter>Tests</Filter>
-    </CudaCompile>
-    <CudaCompile Include="TreeTest.cu">
-      <Filter>Tests</Filter>
-    </CudaCompile>
     <CudaCompile Include="PhotonMap.cu">
       <Filter>DataStructures</Filter>
     </CudaCompile>
-    <CudaCompile Include="PhotonMapInsertTest.cu">
-      <Filter>Tests</Filter>
-    </CudaCompile>
     <CudaCompile Include="math_functions.cuh">
       <Filter>Tools</Filter>
-    </CudaCompile>
-    <CudaCompile Include="PhotonMapGetClosestTest.cu">
-      <Filter>Tests</Filter>
-    </CudaCompile>
-    <CudaCompile Include="RayTraycingTest.cu">
-      <Filter>Tests</Filter>
     </CudaCompile>
     <CudaCompile Include="Ray.cu">
       <Filter>DataStructures\Ray</Filter>
@@ -43,9 +19,6 @@
     </CudaCompile>
     <CudaCompile Include="Model.cu">
       <Filter>Model</Filter>
-    </CudaCompile>
-    <CudaCompile Include="RandomTest.cu">
-      <Filter>Tests</Filter>
     </CudaCompile>
     <CudaCompile Include="vec3_funcs.cu">
       <Filter>Tools\vec3_funcs</Filter>
@@ -60,6 +33,9 @@
     <CudaCompile Include="CudaUtils.cu">
       <Filter>Tools\CudaUtils</Filter>
     </CudaCompile>
+    <CudaCompile Include="GlobalParams.cu">
+      <Filter>Global</Filter>
+    </CudaCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Printers.h">
@@ -67,9 +43,6 @@
     </ClInclude>
     <ClInclude Include="PriorityQueue.cuh">
       <Filter>DataStructures</Filter>
-    </ClInclude>
-    <ClInclude Include="Test.cuh">
-      <Filter>Tests</Filter>
     </ClInclude>
     <ClInclude Include="Tree.cuh">
       <Filter>DataStructures</Filter>
@@ -169,21 +142,23 @@
     <ClInclude Include="CuOptStack.cuh">
       <Filter>DataStructures</Filter>
     </ClInclude>
-    <ClInclude Include="MediumManager.cuh">
-      <Filter>Tracing</Filter>
-    </ClInclude>
     <ClInclude Include="RaytracePlanner.cuh">
       <Filter>Tracing</Filter>
     </ClInclude>
-    <ClInclude Include="Defines.cuh" />
     <ClInclude Include="CudaUtils.cuh">
       <Filter>Tools\CudaUtils</Filter>
     </ClInclude>
+    <ClInclude Include="MediumManager.cuh">
+      <Filter>Tracing\MediumManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Defines.cuh">
+      <Filter>Global</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalParams.cuh">
+      <Filter>Global</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Tests">
-      <UniqueIdentifier>{780e6d14-61b0-4876-8fbe-e022926c2090}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Tools">
       <UniqueIdentifier>{1d5ec51a-674c-438d-b639-947834fa7ec5}</UniqueIdentifier>
     </Filter>
@@ -234,6 +209,12 @@
     </Filter>
     <Filter Include="Tools\CudaUtils">
       <UniqueIdentifier>{7b1d5b66-f0b7-4e0d-8325-796ee9bcc6d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tracing\MediumManager">
+      <UniqueIdentifier>{7a38b8af-c6a8-4159-8525-e5c1620cc8a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Global">
+      <UniqueIdentifier>{d5d16cbe-d603-47da-89d6-b9b52a8ad04f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

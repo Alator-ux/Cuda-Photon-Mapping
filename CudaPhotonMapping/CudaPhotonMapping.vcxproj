@@ -83,15 +83,16 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;opengl32.lib;glfw\glfw3.lib;glfw\glfw3dll.lib;glew\glew32.lib;GnuWin32\jpeg.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)\Linking\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;opengl32.lib;glfw3.lib;glfw3dll.lib;glew32.lib;jpeg.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Linking\lib;$(SolutionDir)Linking\lib\glfw;$(SolutionDir)Linking\lib\glew;$(SolutionDir)Linking\lib\GnuWin32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
-      <GPUDebugInfo>true</GPUDebugInfo>
-      <PtxAsOptionV>true</PtxAsOptionV>
-      <GenerateRelocatableDeviceCode>false</GenerateRelocatableDeviceCode>
+      <GPUDebugInfo>false</GPUDebugInfo>
+      <PtxAsOptionV>false</PtxAsOptionV>
+      <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
       <ExtensibleWholeProgramCompilation>false</ExtensibleWholeProgramCompilation>
+      <GenerateLineInfo>false</GenerateLineInfo>
     </CudaCompile>
     <CudaLink />
   </ItemDefinitionGroup>
@@ -124,13 +125,16 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>cudart_static.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;opengl32.lib;glfw\glfw3.lib;glfw\glfw3dll.lib;glew\glew32.lib;GnuWin32\jpeg.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>cudart_static.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;opengl32.lib;glfw3.lib;glfw3dll.lib;glew32.lib;jpeg.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>LIBCMT</IgnoreSpecificDefaultLibraries>
-      <AdditionalLibraryDirectories>$(SolutionDir)\Linking\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\Linking\lib;$(SolutionDir)\Linking\lib\glfw;$(SolutionDir)\Linking\lib\glew;$(SolutionDir)\Linking\lib\GnuWin32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
-      <GenerateRelocatableDeviceCode>false</GenerateRelocatableDeviceCode>
+      <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
+      <GPUDebugInfo>false</GPUDebugInfo>
+      <GenerateLineInfo>false</GenerateLineInfo>
+      <PtxAsOptionV>false</PtxAsOptionV>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -157,22 +161,14 @@
     <CudaCompile Include="CudaRandom.cu" />
     <CudaCompile Include="CudaUtils.cu" />
     <CudaCompile Include="Drawer.cu" />
+    <CudaCompile Include="GlobalParams.cu" />
     <CudaCompile Include="Initializer.cu" />
     <CudaCompile Include="math_functions.cuh" />
     <CudaCompile Include="Model.cu" />
     <CudaCompile Include="PhotonMap.cu" />
-    <CudaCompile Include="PhotonMapGetClosestTest.cu" />
-    <CudaCompile Include="PhotonMapInsertTest.cu" />
-    <CudaCompile Include="PhotonTest.cu" />
-    <CudaCompile Include="PriorityQueueTest.cu" />
     <CudaCompile Include="kernel.cu" />
-    <CudaCompile Include="RandomTest.cu" />
     <CudaCompile Include="Ray.cu" />
     <CudaCompile Include="RaytracePlanner.cu" />
-    <CudaCompile Include="RayTraycingTest.cu" />
-    <CudaCompile Include="StackTest.cu" />
-    <CudaCompile Include="Test.cu" />
-    <CudaCompile Include="TreeTest.cu" />
     <CudaCompile Include="vec3_funcs.cu" />
   </ItemGroup>
   <ItemGroup>
@@ -185,6 +181,7 @@
     <ClInclude Include="DeepLookStack.cuh" />
     <ClInclude Include="Defines.cuh" />
     <ClInclude Include="FourTuple.cuh" />
+    <ClInclude Include="GlobalParams.cuh" />
     <ClInclude Include="Initializer.cuh" />
     <ClInclude Include="MediumManager.cuh" />
     <ClInclude Include="Light.cuh" />
@@ -207,7 +204,6 @@
     <ClInclude Include="RenderEnums.cuh" />
     <ClInclude Include="Scene.cuh" />
     <ClInclude Include="Sort.cuh" />
-    <ClInclude Include="Test.cuh" />
     <ClInclude Include="Stack.cuh" />
     <ClInclude Include="TestablePhotonMap.cuh" />
     <ClInclude Include="Timer.cuh" />
