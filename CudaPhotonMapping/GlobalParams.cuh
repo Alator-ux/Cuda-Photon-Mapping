@@ -3,7 +3,7 @@
 #include "Defines.cuh"
 
 namespace GlobalParams {
-    /* Refractive index */
+    /* ===== Refractive index ===== */
     extern float cpu_default_refractive_index;
     extern __constant__ float gpu_default_refractive_index;
 
@@ -17,7 +17,7 @@ namespace GlobalParams {
 
     __host__ void set_default_refractive_index(float value);
 
-    /* Max depth */
+    /* ===== Max depth ===== */
     extern int cpu_max_depth;
     extern __constant__ int gpu_max_depth;
 
@@ -30,4 +30,20 @@ namespace GlobalParams {
     }
 
     __host__ void set_max_depth(int value);
+
+    /* ===== Models Refractive Indices ===== */
+    extern float* cpu_models_refractive_indices;
+    extern float* gpu_models_refractive_indices;
+
+    __host__ __device__ __forceinline__ float inline model_refractive_index(int id) {
+#ifdef __CUDA_ARCH__
+        return gpu_models_refractive_indices[id];
+#else
+        return cpu_models_refractive_indices[id];
+#endif
+    }
+
+    //__host__ void set_models_refractive_indices(std::vector<float> a);
+    // 256 *
+    //       8 * 80 + 8 * 4 * 8
 }

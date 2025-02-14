@@ -96,9 +96,9 @@ private:
         if (stack_id == 3156) {
             printf("b");
         }
-        bool replace_medium = false;
+        bool max_medium_depth = false;
         while ((current_depth < GlobalParams::max_depth() && current_depth != new_depth)
-                || ray_planner.pop_refraction(stack_id, replace_medium, current_ray, new_depth, new_ray_coef, in_object)) {
+                || ray_planner.pop_refraction(stack_id, max_medium_depth, current_ray, new_depth, new_ray_coef, in_object)) {
 
             current_depth = new_depth;
             
@@ -151,7 +151,7 @@ private:
                 bool succ = current_ray.refract(inter_p, normal,
                     prev_new_refr_ind.item1, prev_new_refr_ind.item2, nray);
                 if (succ) {
-                    ray_planner.push_refraction(stack_id, replace_medium,
+                    ray_planner.push_refraction(stack_id, max_medium_depth,
                         nray, current_depth, new_ray_coef,
                         model_id, mat.refr_index, mat.opaque, prev_new_refr_ind.item3);
                 }

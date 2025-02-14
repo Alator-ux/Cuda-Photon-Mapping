@@ -7,12 +7,12 @@
 int main(int argc, char * argv[]) {
     setlocale(LC_ALL, "");
     cudaSetDevice(0);
-    /*int width  = 1024;
-    int height = 768;*/
+    int width  = 1024;
+    int height = 768;
     /*int width = 2560;
     int height = 1080;*/
-    int width = 100;
-    int height = 100;
+    /*int width = 100;
+    int height = 100;*/
 
     Printer::cuda_properties();
 

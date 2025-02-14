@@ -76,24 +76,24 @@ public:
 	__host__ __device__ cpm::Tuple3<float, float, bool> get_refractive_indices(size_t stack_id, int model_id, float model_refractive_index) {
 		return medium_managers[stack_id].get_refractive_indices(model_id, model_refractive_index);
 	}
-	__host__ __device__ void push_refraction(size_t stack_id, bool& replace_medium,
+	__host__ __device__ void push_refraction(size_t stack_id, bool& max_level,
 		const cpm::Ray& ray, int depth, const cpm::vec3& coef,
 		int model_id, float model_refractive_index, float model_opaque, bool in_object) {
 		if (stack_id >= array_size) {
 			printf("Stack id >= array size in RaytracePlanner, function push_refraction");
 			return;
 		}
-		medium_managers[stack_id].increase_depth(replace_medium);
-		medium_managers[stack_id].inform(model_id, model_refractive_index);
+		medium_managers[stack_id].increase_depth(max_level);
+		medium_managers[stack_id].inform(model_id, model_refractive_index, max_level);
 
 		planner[stack_id].push({ ray, depth + 1, coef * (1.f - model_opaque), in_object });
 
 	}
-	__host__ __device__ bool pop_refraction(size_t stack_id, bool& replace_medium, 
+	__host__ __device__ bool pop_refraction(size_t stack_id, bool& max_level, 
 		cpm::Ray& ray, int& depth, cpm::vec3& coef, bool& in_object) {
-		if (replace_medium) { // no refractions by this ray
-			medium_managers[stack_id].reduce_depth();
-		}
+		// no refractions by this ray
+		medium_managers[stack_id].reduce_depth(max_level);
+
 		if (stack_id >= array_size) {
 			printf("Stack id >= array size in RaytracePlanner, function pop_refraction");
 			return false;
@@ -106,7 +106,6 @@ public:
 		depth = plan.depth;
 		coef = plan.coef;
 		in_object = plan.in_object;
-		replace_medium = true;
 		return true;
 	}
 	__device__ bool isNotEmpty(size_t stack_id) {

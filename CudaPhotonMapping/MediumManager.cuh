@@ -45,46 +45,55 @@ public:
     }
     __host__ __device__ cpm::Tuple3<float, float, bool> get_refractive_indices(
         size_t model_id, float model_refractive_index) {
-        size_t mediums_size = mediums_stack.get_size();
-        if (mediums_size == 0) {
+        int level_size = mediums_stack.get_size();
+        if (level_size == 0) {
             return { GlobalParams::default_refractive_index(), model_refractive_index, true };
         }
-        auto mediums = mediums_stack.top();
-        auto medium = mediums.top();
 
+        auto mediums = mediums_stack.top();
+        if (mediums.get_size() == 0) {
+            return { GlobalParams::default_refractive_index(), model_refractive_index, true };
+        }
+
+        auto medium = mediums.top();
         if (medium.hit_id == model_id) {
+            bool in_object = mediums.get_size() > 1;
             return { 
                 model_refractive_index, 
-                mediums.get_size() < 2 ? GlobalParams::default_refractive_index() :
-                                    mediums.top(1).refractive_index,
-                false 
+                in_object ? mediums.top(1).refractive_index :
+                            GlobalParams::default_refractive_index(),
+                in_object
             };
         }
 
         return { medium.refractive_index, model_refractive_index, true };
     }
-    __host__ __device__ void increase_depth(bool& replace_medium) {
-        if (replace_medium) {
-            replace_medium = false;
-            return;
-        }
-
-        if (mediums_stack.get_size() == 0) {
+    __host__ __device__ void increase_depth(bool& max_level) {
+        auto level_size = mediums_stack.get_size();
+        if (level_size == 0) {
             mediums_stack.set_size(1);
+            level_size++;
+        }
+        if (level_size < GlobalParams::max_depth()) {
+            mediums_stack.push_copy(mediums_stack.top(), (GlobalParams::max_depth() + 1) / 2);
+            max_level = false;
         }
         else {
-            mediums_stack.push_copy(mediums_stack.top(), (GlobalParams::max_depth() + 1) / 2, 1);
+            max_level = true;
         }
     }
-    __host__ __device__ void reduce_depth() {
-        mediums_stack.pop();
+    __host__ __device__ void reduce_depth(bool& max_level) {
+        if (!max_level) {
+            mediums_stack.pop();
+        }
+        max_level = false;
     }
-    __host__ __device__ void inform(int model_id, float model_refractive_index) {
-        auto mediums = mediums_stack.top_pointer();
+    __host__ __device__ void inform(int model_id, float model_refractive_index, bool max_level) {
+        auto mediums = mediums_stack.top_pointer(max_level ? 0 : 1);
         
-        if (mediums->get_size() > 0) {
-            auto medium = mediums->top();
-            if (medium.hit_id == model_id) {
+        auto medium = mediums->top_pointer();
+        if (medium != nullptr) {
+            if (medium->hit_id == model_id) {
                 mediums->pop();
             }
         }
