@@ -161,6 +161,9 @@
     <ClInclude Include="Initializer.cuh">
       <Filter>Initilization</Filter>
     </ClInclude>
+    <ClInclude Include="AABB.cuh">
+      <Filter>Model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Tools">

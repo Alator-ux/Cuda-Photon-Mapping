@@ -172,6 +172,7 @@
     <CudaCompile Include="vec3_funcs.cu" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AABB.cuh" />
     <ClInclude Include="ArrayTools.cuh" />
     <ClInclude Include="Camera.cuh" />
     <ClInclude Include="CudaOpenGLUtils.cuh" />

@@ -11,6 +11,7 @@
 #include "CudaRandom.cuh"
 #include "Ray.cuh"
 #include "Defines.cuh"
+#include "AABB.cuh"
 
 namespace {
     __device__ int device_model_id_gen = 1;
@@ -23,6 +24,7 @@ namespace {
 class Model {
 public:
 	ModelConstructInfo mci;
+    AABB bounding_box;
 	int id;
 
 	__host__ __device__ float calculate_triangle_area(const cpm::vec2& v0, const cpm::vec2& v1, const cpm::vec2& v2) const
@@ -116,15 +118,14 @@ public:
         out_uvw.z = w;
         return true; // this ray hits the triangle
     }
-  
-    
 
 public:
 	__host__ Model(const Model& other) {
 		this->mci = other.mci;
 		this->id = other.id;
+        this->bounding_box = other.bounding_box;
 	}
-	__host__ __device__ Model(ModelConstructInfo& mci, int id = -1) {
+	__host__ __device__ Model(ModelConstructInfo& mci, int id = -1) : bounding_box(mci.positions, mci.size) {
 		this->mci.swap(mci);
 		this->id = id;
 	}
@@ -365,7 +366,9 @@ public:
 
     __host__ __device__ bool intersection(const cpm::Ray& ray, bool in_object, float& intersection,
         cpm::vec3& out_normal) const {
-
+        if (!bounding_box.intersects_with_ray(ray)) {
+            return false;
+        }
         intersection = FLT_MAX;
         size_t ii0 = 0;
         size_t ii1 = 0;
