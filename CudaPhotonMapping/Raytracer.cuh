@@ -190,32 +190,13 @@ private:
 
         cpm::Ray ray(scene.camera.position, scene.camera.generate_ray_direction(x, y));
 
-        /*Model* m;
-        cpm::vec3 t1, t2;
-        for (int i = 0; i < 10; i++) {
-            ray.origin -= cpm::vec3(0, 0, 0.001f);
-            bool res = find_intersection(ray, false, m, t1, t2);
-            if (res) {
-                canvas[id] = make_uchar3((255 * i) % 255, t1.x * 255, t2.y * 255);
-            }
-            else {
-                canvas[id] = make_uchar3(0, 0, 0);
-            }
+        /*Model* model;
+        cpm::vec3 normal, i_point;
+        if (find_intersection(ray, false, model, normal, i_point)) {
+            normal.clamp_max(0.f);
+            canvas[id] = make_uchar3(normal.x * 255, normal.y * 255, normal.z * 255);
         }*/
 
-        /*float outf;
-        cpm::vec3 outv;
-        for (int i = 0; i < 2188; i++) {
-            bool res = traingle_intersection(ray, p1, p2, p1, outf, outv);
-            if (res) {
-                canvas[id] = make_uchar3(255, 255 ,255);
-            }
-            else {
-                canvas[id] = make_uchar3(0, 0, 0);
-            }
-        }*/
-
-        //find_intersection(ray, false, intersection_infos + local_id
         cpm::vec3 pixel_color = render_trace(ray, false, id);
         if (ray_planner.isNotEmpty(id)) {
             Printer().s("Stack with id ").i(id).s(" is not empty").nl();

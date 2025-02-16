@@ -13,6 +13,8 @@ int main(int argc, char * argv[]) {
     int height = 1080;*/
     /*int width = 100;
     int height = 100;*/
+    /*int width = 128;
+    int height = 128;*/
 
     Printer::cuda_properties();
 

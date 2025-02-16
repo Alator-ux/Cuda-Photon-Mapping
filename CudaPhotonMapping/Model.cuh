@@ -10,6 +10,7 @@
 #include "Pair.cuh"
 #include "CudaRandom.cuh"
 #include "Ray.cuh"
+#include "Defines.cuh"
 
 namespace {
     __device__ int device_model_id_gen = 1;
@@ -354,67 +355,76 @@ public:
 
         return true;
     }
-   
-    __host__ __device__ bool intersection(const cpm::Ray& ray, bool in_object, float& intersection, 
+
+    __host__ __device__ __forceinline__ void copy_positions_to_shared(cpm::vec3* shared_pos, cpm::vec3* global_pos, int shared_size, int global_index) const {
+        global_index += threadIdx.x;
+        for (int local_index = threadIdx.x; (global_index < mci.size) && (local_index < shared_size); local_index += THREADS_NUMBER, global_index += THREADS_NUMBER) {
+            shared_pos[local_index] = global_pos[global_index];
+        }
+    }
+
+    __host__ __device__ bool intersection(const cpm::Ray& ray, bool in_object, float& intersection,
         cpm::vec3& out_normal) const {
+
         intersection = FLT_MAX;
         size_t ii0 = 0;
         size_t ii1 = 0;
         size_t ii2 = 0;
         cpm::vec3 uvw;
-        size_t i = 0;
+        size_t global_index = 0;
         bool intersection_found;
-        int primitive_index = 0;
-        while (primitive_index < mci.primitives_size) {
+        int vertices_number = mci.size;
+        cpm::vec3* positions = mci.positions;
+        while (global_index < vertices_number) {
             float possible_ray_parameter = 0.f;
             cpm::vec3 possible_uvw;
             if (mci.type == ModelType::Triangle) {
-                cpm::vec3 v0 = mci.positions[i];
-                cpm::vec3 v1 = mci.positions[i + 1];
-                cpm::vec3 v2 = mci.positions[i + 2];
+                cpm::vec3 v0 = positions[global_index];
+                cpm::vec3 v1 = positions[global_index + 1];
+                cpm::vec3 v2 = positions[global_index + 2];
                 intersection_found = traingle_intersection(ray, in_object,
                     v0, v1, v2,
                     possible_ray_parameter, possible_uvw);
                 if (intersection_found && possible_ray_parameter < intersection) {
                     intersection = possible_ray_parameter;
                     uvw = possible_uvw;
-                    ii0 = i;
-                    ii1 = i + 1;
-                    ii2 = i + 2;
+                    ii0 = global_index;
+                    ii1 = global_index + 1;
+                    ii2 = global_index + 2;
                 }
-                i += 3;
+                global_index += 3;
             }
             else if (mci.type == ModelType::Quad) {
                 intersection_found = traingle_intersection(ray, in_object,
-                    mci.positions[i], mci.positions[i + 1], mci.positions[i + 3],
+                    mci.positions[global_index], mci.positions[global_index + 1], mci.positions[global_index + 3],
                     possible_ray_parameter, possible_uvw);
                 if (intersection_found && possible_ray_parameter < intersection) {
                     intersection = possible_ray_parameter;
                     uvw = possible_uvw;
-                    ii0 = i;
-                    ii1 = i + 1;
-                    ii2 = i + 3;
+                    ii0 = global_index;
+                    ii1 = global_index + 1;
+                    ii2 = global_index + 3;
                 }
                 else {
                     possible_ray_parameter = 0.f;
                     intersection_found = traingle_intersection(ray, in_object,
-                        mci.positions[i + 1], mci.positions[i + 2], mci.positions[i + 3],
+                        mci.positions[global_index + 1], mci.positions[global_index + 2], mci.positions[global_index + 3],
                         possible_ray_parameter, possible_uvw);
                     if (intersection_found && possible_ray_parameter < intersection) {
                         intersection = possible_ray_parameter;
                         uvw = possible_uvw;
-                        ii0 = i + 1;
-                        ii1 = i + 2;
-                        ii2 = i + 3;
+                        ii0 = global_index + 1;
+                        ii1 = global_index + 2;
+                        ii2 = global_index + 3;
                     }
                 }
-                i += 4;
+                global_index += 4;
             }
             else {
                 printf("Unknown model vertex organization\n");
             }
-            primitive_index++;
         }
+
         // Return false if no intersection was found (ii2 was not updated)
         if (ii2 == 0) {
             return false;
