@@ -18,7 +18,7 @@ int main(int argc, char * argv[]) {
 
     Printer::cuda_properties();
 
-    initialize_global_params(8, 1.f);
+    initialize_global_params(4, 1.f);
 
     Camera camera(cpm::vec3(-0.00999999046, 0.795000017, 2.35000001), cpm::vec3(0.f, 0.f, -1.f), cpm::vec3(0.f, 1.f,0.f),
                   60, width, height); // TODO remove hardcode;

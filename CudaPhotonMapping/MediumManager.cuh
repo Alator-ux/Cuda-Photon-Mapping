@@ -105,7 +105,7 @@ public:
         MMInnerData* medium_manager_innder_data, int max_depth, int max_medium_depth) {
         mediums_stack.set_data(medium_manager_inner_container, max_depth);
 
-        for (size_t i = 0; i < max_medium_depth; i++) {
+        for (size_t i = 0; i < max_depth; i++) {
             medium_manager_inner_container[i].set_data(medium_manager_innder_data + max_medium_depth * i, max_medium_depth);
         }
     }

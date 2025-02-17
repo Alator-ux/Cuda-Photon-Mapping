@@ -378,10 +378,11 @@ public:
         bool intersection_found;
         int vertices_number = mci.size;
         cpm::vec3* positions = mci.positions;
+        ModelType model_type = mci.type;
         while (global_index < vertices_number) {
             float possible_ray_parameter = 0.f;
             cpm::vec3 possible_uvw;
-            if (mci.type == ModelType::Triangle) {
+            if (model_type == ModelType::Triangle) {
                 cpm::vec3 v0 = positions[global_index];
                 cpm::vec3 v1 = positions[global_index + 1];
                 cpm::vec3 v2 = positions[global_index + 2];
@@ -397,7 +398,7 @@ public:
                 }
                 global_index += 3;
             }
-            else if (mci.type == ModelType::Quad) {
+            else if (model_type == ModelType::Quad) {
                 intersection_found = traingle_intersection(ray, in_object,
                     mci.positions[global_index], mci.positions[global_index + 1], mci.positions[global_index + 3],
                     possible_ray_parameter, possible_uvw);

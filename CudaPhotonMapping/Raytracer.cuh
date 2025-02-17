@@ -198,9 +198,6 @@ private:
             normal.clamp_max(0.f);
             canvas[id] = make_uchar3(normal.x * 255, normal.y * 255, normal.z * 255);
         }*/
-        if (id == 45) {
-            printf("aa");
-        }
         cpm::vec3 pixel_color = render_trace(ray, false, id);
         if (ray_planner.isNotEmpty(id)) {
             Printer().s("Stack with id ").i(id).s(" is not empty").nl();

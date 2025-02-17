@@ -1,7 +1,9 @@
 #pragma once
 #include "CudaUtils.cuh"
 
-#define THREADS_NUMBER 256
+#define TWO_D_THREADS_NUMBER 16
+
+#define THREADS_NUMBER TWO_D_THREADS_NUMBER * TWO_D_THREADS_NUMBER
 
 #define uint unsigned int
 

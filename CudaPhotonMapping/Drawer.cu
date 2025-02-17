@@ -22,7 +22,7 @@ void Drawer::draw_in_gpu(int frame) {
 	checkCudaErrors(cudaGraphicsMapResources(1, &cuda_resource, 0));
 	checkCudaErrors(cudaGraphicsResourceGetMappedPointer((void**)&gpu_canvas, &size, cuda_resource));
 
-	dim3 threads(16, 16);
+	dim3 threads(TWO_D_THREADS_NUMBER, TWO_D_THREADS_NUMBER);
 	dim3 blocks((width + threads.x - 1) / threads.x, (height + threads.y - 1) / threads.y);
 	/*int shared_memory = block.x * block.y * sizeof(Raytracer::IntersectionInfo);*/
 
