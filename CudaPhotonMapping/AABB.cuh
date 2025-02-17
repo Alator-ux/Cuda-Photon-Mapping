@@ -3,29 +3,41 @@
 #include "Ray.cuh"
 #include "Pair.cuh"
 
+/*
+* Source: https://tavianator.com/2022/ray_box_boundary.html
+*/
 class AABB {
-	cpm::vec3 min, max;
-    __host__ __device__ __forceinline__ 
-    inline void update_tmin_tmax(float min_t, float max_t, float origin_t, float direction_t, 
+    float corners[6] = {0.f, 0.f, 0.f, 
+                        0.f, 0.f, 0.f};
+    __host__ __device__ __inline__ 
+    inline void update_tmin_tmax(int i, float origin_i, float direction_i, 
                                  float& tmin, float& tmax) const {
-        float t1 = (min_t - origin_t) / direction_t;
-        float t2 = (max_t - origin_t) / direction_t;
-        tmin = fminf(fmaxf(t1, tmin), fmaxf(t2, tmin));
-        tmax = fmaxf(fminf(t1, tmax), fminf(t2, tmax));
+        bool sign = signbit(direction_i);
+        float bmin = corners[sign * 3 + i];
+        float bmax = corners[!sign * 3 + i];
+        
+        float dmin = (bmin - origin_i) / direction_i;
+        float dmax = (bmax - origin_i) / direction_i;
+
+        tmin = fmaxf(dmin, tmin);
+        tmax = fminf(dmax, tmax);
     }
 public:
-    __host__ __device__ AABB() : min(0.f), max(0.f) {}
+    __host__ __device__ AABB() {}
     __host__ __device__ AABB(const cpm::vec3* positions, size_t size) {
-        min = positions[0];
-        max = positions[0];
+        for (int point_i = 0; point_i < 3; point_i++) {
+           corners[point_i] = positions[0][point_i];
+           corners[point_i + 3] = positions[0][point_i];
+        }
+
         for (size_t i = 1; i < size; i++) {
             auto position = positions[i];
             for (int point_i = 0; point_i < 3; point_i++) {
-                if (position[point_i] > max[point_i]) {
-                    max[point_i] = position[point_i];
+                if (position[point_i] > corners[point_i + 3]) {
+                    corners[point_i + 3] = position[point_i];
                 }
-                if (position[point_i] < min[point_i]) {
-                    min[point_i] = position[point_i];
+                if (position[point_i] < corners[point_i]) {
+                    corners[point_i] = position[point_i];
                 }
             }
         }
@@ -33,9 +45,9 @@ public:
     __host__ __device__ bool intersects_with_ray(const cpm::Ray& ray) const {
         float tmin = 0.0, tmax = INFINITY;
 
-        update_tmin_tmax(min.x, max.x, ray.origin.x, ray.direction.x, tmin, tmax);
-        update_tmin_tmax(min.y, max.y, ray.origin.y, ray.direction.y, tmin, tmax);
-        update_tmin_tmax(min.z, max.z, ray.origin.z, ray.direction.z, tmin, tmax);   
+        update_tmin_tmax(0, ray.origin.x, ray.direction.x, tmin, tmax);
+        update_tmin_tmax(1, ray.origin.y, ray.direction.y, tmin, tmax);
+        update_tmin_tmax(2, ray.origin.z, ray.direction.z, tmin, tmax);   
 
         return tmin <= tmax;
     }

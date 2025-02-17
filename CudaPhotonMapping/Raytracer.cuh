@@ -174,19 +174,21 @@ private:
    public:
   
     __device__ void render_gpu(uchar3* canvas, int width, int height) {
-        /*int x = blockIdx.x * blockDim.x + threadIdx.x;
+        int x = blockIdx.x * blockDim.x + threadIdx.x;
         int y = blockIdx.y * blockDim.y + threadIdx.y;
         int local_id = threadIdx.y * blockDim.x + threadIdx.x;
-        if (x >= width || y >= height) return;*/
+        if (x >= width || y >= height) return;
 
-        int id = blockIdx.x * blockDim.x + threadIdx.x;
+        int id = y * width + x;
+
+        /*int id = blockIdx.x * blockDim.x + threadIdx.x;
         if (id >= width * height) {
             return;
         }
         int x = id % width;
         int y = id / width;
         
-        int local_id = threadIdx.x;
+        int local_id = threadIdx.x;*/
 
         cpm::Ray ray(scene.camera.position, scene.camera.generate_ray_direction(x, y));
 
@@ -196,7 +198,9 @@ private:
             normal.clamp_max(0.f);
             canvas[id] = make_uchar3(normal.x * 255, normal.y * 255, normal.z * 255);
         }*/
-
+        if (id == 45) {
+            printf("aa");
+        }
         cpm::vec3 pixel_color = render_trace(ray, false, id);
         if (ray_planner.isNotEmpty(id)) {
             Printer().s("Stack with id ").i(id).s(" is not empty").nl();

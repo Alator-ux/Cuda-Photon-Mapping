@@ -22,16 +22,16 @@ void Drawer::draw_in_gpu(int frame) {
 	checkCudaErrors(cudaGraphicsMapResources(1, &cuda_resource, 0));
 	checkCudaErrors(cudaGraphicsResourceGetMappedPointer((void**)&gpu_canvas, &size, cuda_resource));
 
-	/*dim3 block(16, 16);
-	dim3 grid((width + block.x - 1) / block.x, (height + block.y - 1) / block.y);
-	int shared_memory = block.x * block.y * sizeof(Raytracer::IntersectionInfo);*/
+	dim3 threads(16, 16);
+	dim3 blocks((width + threads.x - 1) / threads.x, (height + threads.y - 1) / threads.y);
+	/*int shared_memory = block.x * block.y * sizeof(Raytracer::IntersectionInfo);*/
 
-	int threads = THREADS_NUMBER;
+	/*int threads = THREADS_NUMBER;
 	int blocks = (width * height + threads - 1) / threads;
-	int shared_memory = threads * sizeof(cpm::vec3*) * 3;
+	int shared_memory = threads * sizeof(cpm::vec3*) * 3;*/
 	timer.startCUDA();
 	//compute << <blocks, threads >> > (gpu_canvas, width, height, frame);
-	gpu_kernel << <blocks, threads, shared_memory >> > (gpu_canvas, gpu_raytracer, width, height);
+	gpu_kernel << <blocks, threads >> > (gpu_canvas, gpu_raytracer, width, height);
 	timer.stopCUDA();
 	timer.printCUDA();
 	checkCudaErrors(cudaGetLastError());
