@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <curand_kernel.h>
 #include <crt/host_defines.h>
 #include "ostream"
 #include "iostream"
@@ -19,7 +20,12 @@ namespace {
 #endif
 namespace cpm {
     struct alignas(16) vec3 {
-        float x, y, z;
+        union {
+            float data[3];
+            struct {
+                float x, y, z;
+            };
+        };
 
         __host__ __device__ vec3() {
             x = 0.f;
@@ -27,16 +33,18 @@ namespace cpm {
             z = 0.f;
         }
 
-        __host__ __device__ vec3(float v) {
-            x = v;
-            y = v;
-            z = v;
-        }
+        __host__ __device__ constexpr vec3(float v) : x(v), y(v), z(v) {}
 
         __host__ __device__ vec3(float v1, float v2, float v3) {
             x = v1;
             y = v2;
             z = v3;
+        }
+
+        __host__ __device__ vec3(const cpm::vec3& other) {
+            x = other.x;
+            y = other.y;
+            z = other.z;
         }
 
         __host__ __device__ vec3(float4 f4) {
@@ -56,11 +64,11 @@ namespace cpm {
         }
 
         __host__ __device__ constexpr float operator[](int i) const {
-            return i == 0 ? x : (i == 1 ? y : z);
+            return data[i];
         }
 
         __host__ __device__ constexpr float& operator[](int i) {
-            return i == 0 ? x : (i == 1 ? y : z);
+            return data[i];
         };
 
         // +vec3
@@ -202,7 +210,15 @@ namespace cpm {
 
         __host__ __device__ constexpr vec3& normalize() {
             if (!is_null()) {
+#ifdef USE_INTRINSICS
+                *this *= __frsqrt_rn(
+                    __fmul_rz(x, x)
+                    + __fmul_rz(y, y)
+                    + __fmul_rz(z, z)
+                );
+#else
                 *this /= this->length();
+#endif
             }
             return *this;
         }
@@ -212,7 +228,15 @@ namespace cpm {
                 return v;
             }
             else {
+#ifdef USE_INTRINSICS
+                return v * __frsqrt_rn(
+                    __fmul_rz(v.x, v.x)
+                    + __fmul_rz(v.y, v.y)
+                    + __fmul_rz(v.z, v.z)
+                );
+#else
                 return v / v.length();
+#endif
             }
         }
 
@@ -234,11 +258,16 @@ namespace cpm {
         __host__ __device__ __forceinline__ static constexpr float dot(const vec3& v1, const vec3& v2) {
 #ifdef USE_INTRINSICS
             return
-                (
+                /*(
                     __fmul_rz(v1.x, v2.x)
                     + __fmul_rz(v1.y, v2.y)
                     + __fmul_rz(v1.z, v2.z)
-                    );
+                    );*/
+                __fmaf_ieee_rz(v1.x, v2.x,
+                    __fmaf_ieee_rz(v1.y, v2.y,
+                        __fmul_rz(v1.z, v2.z)
+                    )
+                );
 #else
             return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 #endif
@@ -412,7 +441,7 @@ namespace cpm {
             return *this;
         }
         __host__ __device__ vec3& mult(const vec3& other) {
-#ifdef USE_INTRINSICS
+#ifdef USE_ 
             x = __fmul_rz(x, other.x);
             y = __fmul_rz(y, other.y);
             z = __fmul_rz(z, other.z);
@@ -476,7 +505,7 @@ namespace cpm {
             return x == 0.f && y == 0.f && z == 0.f;
         }
         __host__ __device__ inline bool equal(const cpm::vec3& other) {
-            bool res = true;
+            bool res = true; // TODO in next commit ????
             res = res && fabs(this->x - other.x) < eps;
             res = res && fabs(this->y - other.y) < eps;
             res = res && fabs(this->z - other.z) < eps;

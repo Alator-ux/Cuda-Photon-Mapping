@@ -1,12 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <CudaCompile Include="kernel.cu" />
     <CudaCompile Include="PhotonMap.cu">
       <Filter>DataStructures</Filter>
-    </CudaCompile>
-    <CudaCompile Include="math_functions.cuh">
-      <Filter>Tools</Filter>
     </CudaCompile>
     <CudaCompile Include="Ray.cu">
       <Filter>DataStructures\Ray</Filter>
@@ -26,9 +22,6 @@
     <CudaCompile Include="CudaOpenGLUtils.cu">
       <Filter>Tools\CudaOpenGLUtils</Filter>
     </CudaCompile>
-    <CudaCompile Include="RaytracePlanner.cu">
-      <Filter>Tracing</Filter>
-    </CudaCompile>
     <CudaCompile Include="CudaUtils.cu">
       <Filter>Tools\CudaUtils</Filter>
     </CudaCompile>
@@ -37,6 +30,55 @@
     </CudaCompile>
     <CudaCompile Include="Initializer.cu">
       <Filter>Initilization</Filter>
+    </CudaCompile>
+    <CudaCompile Include="DynamicArrayTest.cu">
+      <Filter>Test</Filter>
+    </CudaCompile>
+    <CudaCompile Include="SharedMemory.cu">
+      <Filter>Tools\CudaUtils</Filter>
+    </CudaCompile>
+    <CudaCompile Include="CGPrefixScanSum.cu">
+      <Filter>Tools\CudaUtils\Prescan</Filter>
+    </CudaCompile>
+    <CudaCompile Include="kernel.cu" />
+    <CudaCompile Include="KdTree.cu">
+      <Filter>DataStructures\KdTree</Filter>
+    </CudaCompile>
+    <CudaCompile Include="MathFunctions.cuh">
+      <Filter>Tools\MathFunctions</Filter>
+    </CudaCompile>
+    <CudaCompile Include="MathFunctions.cu">
+      <Filter>Tools\MathFunctions</Filter>
+    </CudaCompile>
+    <CudaCompile Include="RaytracePlanner.cu">
+      <Filter>Tracing\RaytracePlanner</Filter>
+    </CudaCompile>
+    <CudaCompile Include="MediumContent.cu">
+      <Filter>Tracing\RaytracePlanner\MediumManager\MediumContent.cuh</Filter>
+    </CudaCompile>
+    <CudaCompile Include="MMInnerStack.cu">
+      <Filter>Tracing\RaytracePlanner\MediumManager\MMInnerStack</Filter>
+    </CudaCompile>
+    <CudaCompile Include="RayPlan.cu">
+      <Filter>Tracing\RaytracePlanner\RayPlan</Filter>
+    </CudaCompile>
+    <CudaCompile Include="PhotonTracing.cu">
+      <Filter>Tracing\PhotonTracing</Filter>
+    </CudaCompile>
+    <CudaCompile Include="Pair.cu">
+      <Filter>DataStructures\Pair</Filter>
+    </CudaCompile>
+    <CudaCompile Include="PhotonTraceStack.cu">
+      <Filter>Tracing\PhotonTracing\HelperStructs\PhotonTraceStack</Filter>
+    </CudaCompile>
+    <CudaCompile Include="HashMap.cu">
+      <Filter>DataStructures\HashMap</Filter>
+    </CudaCompile>
+    <CudaCompile Include="PhotonMaxHeap.cu">
+      <Filter>Tracing\PhotonTracing\PhotonGrid\PhotonMaxHeap</Filter>
+    </CudaCompile>
+    <CudaCompile Include="PhotonGrid.cu">
+      <Filter>Tracing\PhotonTracing\PhotonGrid</Filter>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>
@@ -49,12 +91,6 @@
     <ClInclude Include="Tree.cuh">
       <Filter>DataStructures</Filter>
     </ClInclude>
-    <ClInclude Include="Photon.cuh">
-      <Filter>DataStructures</Filter>
-    </ClInclude>
-    <ClInclude Include="Stack.cuh">
-      <Filter>DataStructures</Filter>
-    </ClInclude>
     <ClInclude Include="ArrayTools.cuh">
       <Filter>Tools</Filter>
     </ClInclude>
@@ -62,9 +98,6 @@
       <Filter>DataStructures</Filter>
     </ClInclude>
     <ClInclude Include="FourTuple.cuh">
-      <Filter>DataStructures</Filter>
-    </ClInclude>
-    <ClInclude Include="Pair.cuh">
       <Filter>DataStructures</Filter>
     </ClInclude>
     <ClInclude Include="PhotonMap.cuh">
@@ -143,14 +176,11 @@
     <ClInclude Include="CuOptStack.cuh">
       <Filter>DataStructures</Filter>
     </ClInclude>
-    <ClInclude Include="RaytracePlanner.cuh">
-      <Filter>Tracing</Filter>
-    </ClInclude>
     <ClInclude Include="CudaUtils.cuh">
       <Filter>Tools\CudaUtils</Filter>
     </ClInclude>
     <ClInclude Include="MediumManager.cuh">
-      <Filter>Tracing\MediumManager</Filter>
+      <Filter>Tracing\RaytracePlanner\MediumManager</Filter>
     </ClInclude>
     <ClInclude Include="Defines.cuh">
       <Filter>Global</Filter>
@@ -163,6 +193,96 @@
     </ClInclude>
     <ClInclude Include="AABB.cuh">
       <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="EncodableAABB.cuh">
+      <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="CudaGridSynchronizer.cuh">
+      <Filter>Tools\CudaUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="CudaCLinks.cuh">
+      <Filter>Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="DynamicArrayTest.cuh">
+      <Filter>Test</Filter>
+    </ClInclude>
+    <ClInclude Include="Queue.cuh">
+      <Filter>DataStructures</Filter>
+    </ClInclude>
+    <ClInclude Include="SharedMemory.cuh">
+      <Filter>Tools\CudaUtils</Filter>
+    </ClInclude>
+    <ClInclude Include="PrefixScanSum.cuh">
+      <Filter>Tools\CudaUtils\Prescan</Filter>
+    </ClInclude>
+    <ClInclude Include="CGPrefixScanSum.cuh">
+      <Filter>Tools\CudaUtils\Prescan</Filter>
+    </ClInclude>
+    <ClInclude Include="PrescanCommon.cuh">
+      <Filter>Tools\CudaUtils\Prescan</Filter>
+    </ClInclude>
+    <ClInclude Include="KdTree.cuh">
+      <Filter>DataStructures\KdTree</Filter>
+    </ClInclude>
+    <ClInclude Include="List.cuh">
+      <Filter>DataStructures\Arrays</Filter>
+    </ClInclude>
+    <ClInclude Include="Array.cuh">
+      <Filter>DataStructures\Arrays</Filter>
+    </ClInclude>
+    <ClInclude Include="SoArray.cuh">
+      <Filter>DataStructures\Arrays</Filter>
+    </ClInclude>
+    <ClInclude Include="RaytracePlanner.cuh">
+      <Filter>Tracing\RaytracePlanner</Filter>
+    </ClInclude>
+    <ClInclude Include="Stack.cuh">
+      <Filter>DataStructures\Stack</Filter>
+    </ClInclude>
+    <ClInclude Include="ArrayStack.cuh">
+      <Filter>DataStructures\Stack</Filter>
+    </ClInclude>
+    <ClInclude Include="RayPlan.cuh">
+      <Filter>Tracing\RaytracePlanner\RayPlan</Filter>
+    </ClInclude>
+    <ClInclude Include="RayPlanStack.cuh">
+      <Filter>Tracing\RaytracePlanner\RayPlan</Filter>
+    </ClInclude>
+    <ClInclude Include="MMOuterStack.cuh">
+      <Filter>Tracing\RaytracePlanner\MediumManager</Filter>
+    </ClInclude>
+    <ClInclude Include="MediumContent.cuh">
+      <Filter>Tracing\RaytracePlanner\MediumManager\MediumContent.cuh</Filter>
+    </ClInclude>
+    <ClInclude Include="MMInnerStack.cuh">
+      <Filter>Tracing\RaytracePlanner\MediumManager\MMInnerStack</Filter>
+    </ClInclude>
+    <ClInclude Include="Photon.cuh">
+      <Filter>Tracing\PhotonTracing</Filter>
+    </ClInclude>
+    <ClInclude Include="PhotonTracing.cuh">
+      <Filter>Tracing\PhotonTracing</Filter>
+    </ClInclude>
+    <ClInclude Include="Pair.cuh">
+      <Filter>DataStructures\Pair</Filter>
+    </ClInclude>
+    <ClInclude Include="PhotonTraceStack.cuh">
+      <Filter>Tracing\PhotonTracing\HelperStructs\PhotonTraceStack</Filter>
+    </ClInclude>
+    <ClInclude Include="PhotonArray.cuh">
+      <Filter>Tracing\PhotonTracing\HelperStructs</Filter>
+    </ClInclude>
+    <ClInclude Include="PathOperator.cuh">
+      <Filter>Tracing\PhotonTracing\HelperStructs</Filter>
+    </ClInclude>
+    <ClInclude Include="HashMap.cuh">
+      <Filter>DataStructures\HashMap</Filter>
+    </ClInclude>
+    <ClInclude Include="PhotonMaxHeap.cuh">
+      <Filter>Tracing\PhotonTracing\PhotonGrid\PhotonMaxHeap</Filter>
+    </ClInclude>
+    <ClInclude Include="PhotonGrid.cuh">
+      <Filter>Tracing\PhotonTracing\PhotonGrid</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -217,14 +337,65 @@
     <Filter Include="Tools\CudaUtils">
       <UniqueIdentifier>{7b1d5b66-f0b7-4e0d-8325-796ee9bcc6d6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Tracing\MediumManager">
-      <UniqueIdentifier>{7a38b8af-c6a8-4159-8525-e5c1620cc8a2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Global">
       <UniqueIdentifier>{d5d16cbe-d603-47da-89d6-b9b52a8ad04f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Initilization">
       <UniqueIdentifier>{bfab3b33-a6c0-4b91-8c07-28dc5482b844}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Test">
+      <UniqueIdentifier>{b239a6e0-ed82-4675-99b5-a4c5ad42ee1e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tools\CudaUtils\Prescan">
+      <UniqueIdentifier>{7eee8431-2590-46d4-aa69-5abb8d882698}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructures\KdTree">
+      <UniqueIdentifier>{9d85e604-e863-466d-addc-7903d21cb53e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructures\Arrays">
+      <UniqueIdentifier>{12e36259-3f92-4835-a2be-554007ee5bce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tools\MathFunctions">
+      <UniqueIdentifier>{d376de7a-a8ed-411b-996e-24e58527acd3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tracing\RaytracePlanner">
+      <UniqueIdentifier>{06c51ccf-4211-45a4-b794-e5258bdbd2fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tracing\RaytracePlanner\MediumManager">
+      <UniqueIdentifier>{7a38b8af-c6a8-4159-8525-e5c1620cc8a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tracing\RaytracePlanner\RayPlan">
+      <UniqueIdentifier>{3a3d08cb-72ba-42ad-9b2f-45ef84f4e7cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tracing\RaytracePlanner\MediumManager\MediumContent.cuh">
+      <UniqueIdentifier>{1367497f-661d-42a2-885e-ae2cb60f63a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tracing\RaytracePlanner\MediumManager\MMInnerStack">
+      <UniqueIdentifier>{274dff29-3c0a-4d85-9efd-6f4ac510e089}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tracing\PhotonTracing">
+      <UniqueIdentifier>{6c1a04ac-906a-4fc6-afe7-49dd0ec63c3b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructures\Pair">
+      <UniqueIdentifier>{98b51b8a-798c-4a60-9a5c-8c7d58ccbab3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructures\Stack">
+      <UniqueIdentifier>{791636a0-3ffa-4fce-a69a-19938bf3e143}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tracing\PhotonTracing\HelperStructs">
+      <UniqueIdentifier>{7b5b6649-8fe1-4d67-a5f6-a0f962871fc8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tracing\PhotonTracing\HelperStructs\PhotonTraceStack">
+      <UniqueIdentifier>{705c2374-f8bb-472d-8c79-63ea9863a1e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataStructures\HashMap">
+      <UniqueIdentifier>{14ce7054-b699-48df-941d-70c7fa40e671}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tracing\PhotonTracing\PhotonGrid">
+      <UniqueIdentifier>{6c1dcfca-5820-4855-bbb9-63dded033f2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tracing\PhotonTracing\PhotonGrid\PhotonMaxHeap">
+      <UniqueIdentifier>{2bc594ce-4e33-4cd6-bbf9-ce4e7e0e910b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

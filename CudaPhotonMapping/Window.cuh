@@ -7,6 +7,8 @@
 #include "CudaOpenGLUtils.cuh"
 #include <string>
 #include "OpenglLayer.h"
+#include "PhotonGrid.cuh"
+#include "FourTuple.cuh"
 
 class Window {
 	GLuint pbo;
@@ -29,11 +31,40 @@ class Window {
 
 	int frame = 0;
 
+	bool render_frame = true;
+	bool frame_rendered = false;
+
+	bool space_was_pressed = false;
+	bool n_was_pressed = false;
 	void process_input() {
-		if (glfwGetKey(glfw_window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-			std::cout << "Space key is pressed!" << std::endl;
-			render_mode = render_mode == RenderMode::cpu ? RenderMode::gpu : RenderMode::cpu;
-			drawer.set_render_mode(render_mode);
+		{
+			int state = glfwGetKey(glfw_window, GLFW_KEY_SPACE);
+			if (state == GLFW_PRESS && !space_was_pressed) {
+				if (render_mode == RenderMode::cpu) {
+					std::cout << "Render device is GPU" << std::endl;
+					render_mode = RenderMode::gpu;
+				}
+				else {
+					std::cout << "Render device is CPU" << std::endl;
+					render_mode = RenderMode::cpu;
+				}
+				drawer.set_render_mode(render_mode);
+				space_was_pressed = true;
+			}
+			if (state == GLFW_RELEASE) {
+				space_was_pressed = false;
+			}
+		}
+		{
+			int state = glfwGetKey(glfw_window, GLFW_KEY_N);
+			if (state == GLFW_PRESS) {
+				std::cout << "Start render next frame" << std::endl;
+				render_frame = true;
+				n_was_pressed = true;
+			}
+			if (state == GLFW_RELEASE) {
+				n_was_pressed = false;
+			}
 		}
 	}
 
@@ -73,17 +104,18 @@ class Window {
 	}
 	
 	void render() {
-		drawer.Draw(frame);
-		frame++;
+		if (render_frame) {
+			drawer.Draw(frame);
+			frame++;
 
-		/*glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo);
-		glDrawPixels(width, height, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-		glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);*/
-		if (render_mode == RenderMode::gpu) {
-			opengl_layer.transfer_pbo_to_texture(pbo);
-		}
-		else {
-			opengl_layer.transfer_array_to_texture(drawer.get_cpu_canvas());
+			if (render_mode == RenderMode::gpu) {
+				opengl_layer.transfer_pbo_to_texture(pbo);
+			}
+			else {
+				opengl_layer.transfer_array_to_texture(drawer.get_cpu_canvas());
+			}
+			render_frame = false;
+			frame_rendered = true;
 		}
 		opengl_layer.draw();
 
@@ -94,6 +126,9 @@ class Window {
 	}
 
 	void calculate_FPS() {
+		if (!frame_rendered) {
+			return;
+		}
 		double current_time = glfwGetTime();
 		double elapsed_time = current_time - previous_time;
 
@@ -109,6 +144,7 @@ class Window {
 
 		frame_count = 0;
 		previous_time = current_time;
+		frame_rendered = false;
 	}
 
 public:
@@ -144,6 +180,10 @@ public:
 		this->cpu_scene = cpu_scene;
 		this->gpu_scene = gpu_scene;
 		drawer.set_scenes(cpu_scene, gpu_scene);
+	}
+
+	void set_maps(cpm::four_tuple<PhotonGrid, PhotonGrid, PhotonGrid, PhotonGrid> photon_maps) {
+		drawer.set_photon_maps(photon_maps);
 	}
 
 	~Window() {

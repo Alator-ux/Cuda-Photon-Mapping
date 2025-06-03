@@ -3,7 +3,7 @@
 #include "Defines.cuh"
 
 namespace cpm {
-	__global__ void setup_curand(curandState* states, int size) {
+	__global__ void setup_curand(cudaRandomStateT* states, int size) {
 		int id = threadIdx.x + blockIdx.x * blockDim.x;
 		if (id < size) {
 			curand_init(1234, id, 0, &states[id]);
@@ -12,7 +12,7 @@ namespace cpm {
 
 	cpm::CudaRandom::CudaRandom(int total_threads) {
 		this->states_size = total_threads;
-		checkCudaErrors(cudaMalloc((void**)&this->states, this->states_size * sizeof(curandState)));
+		checkCudaErrors(cudaMalloc((void**)&this->states, this->states_size * sizeof(cudaRandomStateT)));
 
 		int threads_per_block = 256;
 		int blocks = (total_threads + threads_per_block - 1) / threads_per_block;

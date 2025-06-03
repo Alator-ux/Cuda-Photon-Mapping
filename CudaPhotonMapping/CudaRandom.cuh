@@ -1,18 +1,22 @@
 #pragma once
 #include <cuda_runtime.h>
-#include <crt/host_defines.h>
 #include <curand_kernel.h>
 #include "CudaUtils.cuh"
 #include <random>
+#include "Defines.cuh"
 
 namespace cpm {
 	float inline __host__ __device__ __forceinline__ fmap_to_range(float value, float lower, float upper) {
 		return lower + value * (upper - lower);
 	}
 
+	int inline __host__ __device__ __forceinline__ imap_to_range(float value, int lower, int upper) {
+		return roundf(lower + value * (upper - lower));
+	}
+
 	struct CudaRandom {
 	public:
-		curandState* states;
+		cudaRandomStateT* states;
 		int states_size;
 		CudaRandom(int total_threads);
 		~CudaRandom();

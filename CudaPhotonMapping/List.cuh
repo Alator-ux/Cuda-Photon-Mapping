@@ -6,6 +6,7 @@
 #include "CudaCLinks.cuh"
 #include "GlobalParams.cuh"
 #include <cooperative_groups.h>
+#include "PrefixScanSum.cuh"
 
 // God forgive me for list structer on gpu
 namespace cpm {
@@ -23,17 +24,15 @@ namespace cpm {
 		volatile idxtype size;
 		volatile idxtype capacity;
 
-		volatile int status_code = 0;
-		volatile int status_code_after_operation = 0;
 		idxtype shift_index = IDXTYPE_NONE_VALUE;
 
-#ifdef __CUDA_ARCH__
 		/* Only for device code */
 		volatile T* new_data;
 		volatile T* insert_arr;
-		volatile int resize_flag = 1;
-		volatile uint threads_to_wait = 0;
+		volatile PrescanHelperStruct<idxtype> phs;
+		idxtype phs_sum_offset = 0;
 		volatile uint waiting_operation_threads = 0;
+#ifdef __CUDA_ARCH__
 #endif
 
 		template <typename CopyDataType>
@@ -49,7 +48,7 @@ namespace cpm {
 #ifdef __CUDA_ARCH__
 			idxtype new_capacity;
 			if (threadIdx.x == 0 && blockIdx.x == 0) {
-				//printf("resize. old cap = %llu.\n", capacity);
+				//printf("resize. old cap = %u.\n", capacity);
 				new_capacity = capacity == 0 ? 2 : capacity * 2;
 				if (new_capacity < size) {
 					new_capacity = size;
@@ -60,21 +59,14 @@ namespace cpm {
 					printf("Error, not enough memory for list data allocation");
 				}
 				__threadfence();
-				atomicExch((int*)&resize_flag, 0);
 			}
 			
 			
 			grid.sync();
 
-			/*for (idxtype i = threadIdx.x + blockIdx.x * blockDim.x; i < capacity; i += gridDim.x * blockDim.x) {
-				new_data[i] = data[i];
-			}*/
 			copy_data<T>((T*)data, (T*)new_data, capacity);
 			
 			grid.sync();
-			
-
-			//CudaGridSynchronizer::synchronize_grid();
 
 			if (threadIdx.x == 0 && blockIdx.x == 0) {
 				free((T*)data);
@@ -86,14 +78,46 @@ namespace cpm {
 					printf("Error, not enough memory for list data allocation");
 				}
 				insert_arr = new_data;
+				
+				/* Prescan init part */
+				phs.free_pointers();
 
-				atomicExch((int*)&resize_flag, 1);
-				atomicExch((int*)&status_code, status_code_after_operation);
+				idxtype* phs_data = new idxtype[new_capacity];
+				if (phs_data == NULL) {
+					printf("Error, not enough memory for list data allocation");
+				}
+				phs.out_arr = phs_data;
+
+				phs_data = new idxtype[new_capacity];
+				if (phs_data == NULL) {
+					printf("Error, not enough memory for list data allocation");
+				}
+				phs.in_arr = phs_data;
+
+				if (phs.separated_sums_arr == nullptr) {
+					phs_data = new idxtype[PRESCAN_BLOCKS];
+					if (phs_data == NULL) {
+						printf("Error, not enough memory for list data allocation");
+					}
+					phs.separated_sums_arr = phs_data;
+				}
+
+				if (phs.united_sums_arr == nullptr) {
+					phs_data = new idxtype[PRESCAN_BLOCKS];
+					if (phs_data == NULL) {
+						printf("Error, not enough memory for list data allocation");
+					}
+					phs.united_sums_arr = phs_data;
+				}
 			}
+
+			CudaGridSynchronizer::synchronize_grid();
+			for (idxtype i = threadIdx.x + blockIdx.x * blockDim.x; i < size; i += gridDim.x * blockDim.x) {
+				phs.in_arr[i] = 0;
+		}
 			
 
 			grid.sync();
-			//CudaGridSynchronizer::synchronize_grid();
 #else
 			capacity = capacity == 0 ? 2 : capacity * 2;
 			T* new_data = new T[capacity];
@@ -139,6 +163,17 @@ namespace cpm {
 			//		current_index -= step;
 			//	}
 			//}
+#endif
+		}
+
+		__host__ __device__
+		void shift_data_v2(idxtype old_size, T* local_data, T* local_insert_arr) {
+#ifdef __CUDA_ARCH__			
+
+			for (idxtype i = threadIdx.x + blockIdx.x * blockDim.x; i < old_size; i += gridDim.x * blockDim.x) {
+				idxtype shift = phs.out_arr[i];
+				local_insert_arr[i + shift] = local_data[i];
+			}
 #endif
 		}
 
@@ -191,6 +226,68 @@ namespace cpm {
 #endif
 		}
 
+//		__host__ __device__
+//		idxtype insert(idxtype ind, T value, LIST_CUDA_OUTER_PARAMS_DEF) {
+//#ifdef __CUDA_ARCH__
+//			idxtype old_size = size;
+//
+//			grid.sync();
+//
+//			if (should_execute) {
+//				atomicAdd((uint*)&waiting_operation_threads, 1);
+//				atomicAdd((idxtype*)&size, 1);
+//			}
+//
+//			//CudaGridSynchronizer::synchronize_grid();
+//			grid.sync();
+//
+//			if (size > capacity) {
+//				resize(grid);
+//			}
+//
+//			idxtype local_shift_index = IDXTYPE_NONE_VALUE;
+//
+//			bool inserting = false;
+//			while (waiting_operation_threads > 0) {
+//				if (should_execute) {
+//					idxtype old_shift_index = atomicCAS((idxtype*)&shift_index, IDXTYPE_NONE_VALUE, ind);
+//					if (old_shift_index == IDXTYPE_NONE_VALUE) {
+//					    atomicSub((uint*)&waiting_operation_threads, 1);
+//						inserting = true;
+//						local_shift_index = ind;
+//						//printf("%u ", ind);
+//					}
+//					else if (old_shift_index <= ind) {
+//						ind += 1;
+//						local_shift_index = old_shift_index;
+//					}
+//				}
+//				grid.sync();
+//				if (!should_execute) {
+//					local_shift_index = shift_index;
+//				}
+//				old_size += 1;
+//				__threadfence();
+//				shift_data_v1_1(local_shift_index, old_size, (T*)data, (T*)insert_arr);
+//
+//
+//				if (should_execute && inserting) {
+//					insert_arr[ind] = value;
+//					atomicExch((idxtype*)&shift_index, IDXTYPE_NONE_VALUE);
+//					should_execute = false;
+//
+//					T* temp_pointer = (T*)data;
+//					data = insert_arr;
+//					insert_arr = temp_pointer;
+//				}
+//
+//				grid.sync();
+//			}
+//
+//			return inserting ? ind : IDXTYPE_NONE_VALUE;
+//#endif
+//		}
+
 		__host__ __device__
 		idxtype insert(idxtype ind, T value, LIST_CUDA_OUTER_PARAMS_DEF) {
 #ifdef __CUDA_ARCH__
@@ -199,69 +296,42 @@ namespace cpm {
 			grid.sync();
 
 			if (should_execute) {
-				atomicAdd((uint*)&waiting_operation_threads, 1);
 				atomicAdd((idxtype*)&size, 1);
 			}
-
-			//CudaGridSynchronizer::synchronize_grid();
 			grid.sync();
-
+			
 			if (size > capacity) {
 				resize(grid);
 			}
 
-			idxtype local_shift_index = IDXTYPE_NONE_VALUE;
+			if (should_execute) {
+				atomicAdd((idxtype*)&phs.in_arr[ind], IDX_ONE);
+			}
+			grid.sync();
+			
+			prescan<idxtype>(*((PrescanHelperStruct<idxtype>*)&phs), old_size, &phs_sum_offset);
+			grid.sync();
 
-			bool inserting = false;
-			while (waiting_operation_threads > 0) {
-				if (should_execute) {
-					idxtype old_shift_index = atomicCAS((idxtype*)&shift_index, IDXTYPE_NONE_VALUE, ind);
-					if (old_shift_index == IDXTYPE_NONE_VALUE) {
-					    atomicSub((uint*)&waiting_operation_threads, 1);
-						inserting = true;
-						local_shift_index = ind;
-						//printf("%u ", ind);
-					}
-					else if (old_shift_index <= ind) {
-						ind += 1;
-						local_shift_index = old_shift_index;
-					}
-				}
-				grid.sync();
-				if (!should_execute) {
-					local_shift_index = shift_index;
-				}
-				old_size += 1;
-				__threadfence();
-				shift_data_v1_1(local_shift_index, old_size, (T*)data, (T*)insert_arr);
+			shift_data_v2(old_size, (T* __restrict__)data, (T* __restrict__)insert_arr);
+			grid.sync();
 
-
-				if (should_execute && inserting) {
-					insert_arr[ind] = value;
-					atomicExch((idxtype*)&shift_index, IDXTYPE_NONE_VALUE);
-					should_execute = false;
-
-					T* temp_pointer = (T*)data;
-					data = insert_arr;
-					insert_arr = temp_pointer;
-				}
-
-				grid.sync();
+			if (should_execute) {
+				idxtype cell_items = atomicSub((idxtype*)&phs.in_arr[ind], IDX_ONE);
+				ind += cell_items - 1;
+				insert_arr[ind] = value;
 			}
 
-			return inserting ? ind : IDXTYPE_NONE_VALUE;
+			grid.sync();
+			if (threadIdx.x == 0 && blockIdx.x == 0) {
+				T* temp_pointer = (T*)data;
+				data = insert_arr;
+				insert_arr = temp_pointer;
+				phs_sum_offset = 0;
+			}
+			grid.sync();
+
+			return should_execute ? ind : IDXTYPE_NONE_VALUE;
 #endif
-		}
-
-		
-
-		__host__ __device__
-		void set_at(T value, idxtype ind) {
-			if (ind >= size) {
-				Printer::index_out_of_bound_error("class List");
-				return T();
-			}
-			data[ind] = value;
 		}
 
 		//__host__ __device__
@@ -299,10 +369,13 @@ namespace cpm {
 		__host__ __device__
 		idxtype get_capacity() { return capacity; }
 
+		__host__ __device__
+		T* get_data() { return (T*)data; }
+
 		__host__
 		static uint gpu_sizeof() {
-			return sizeof(T*) + sizeof(idxtype) * 3 + sizeof(int) * 2 + // common part
-				sizeof(T*) + sizeof(idxtype*) + sizeof(int) + sizeof(uint) * 2; // gpu part
+			return sizeof(T*) + sizeof(idxtype) * 4 + sizeof(int) * 2 + // common part
+				sizeof(T*) + sizeof(idxtype*) + sizeof(int) + sizeof(uint) * 2 + sizeof(PrescanHelperStruct<idxtype>) + sizeof(idxtype); // gpu part
 		}
 	};
 }

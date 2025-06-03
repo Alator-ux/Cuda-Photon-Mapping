@@ -5,6 +5,7 @@
 
 namespace cpm {
     #define EXP 2.718f
+    // лишнее?
     __host__ __device__ inline float pow(float n, float p) {
         return powf(n, p);
     }
@@ -14,11 +15,12 @@ namespace cpm {
         float dz = p1.z - p2.z;
         return sqrtf(dx * dx + dy * dy + dz * dz);
     }
-    __host__ __device__ inline float abs(float value) { // TODO replace
+    __host__ __device__ inline float abs(float value) {
         if (value < 0) {
             return -value;
         }
         return value;
     }
-
 }
+
+__host__ __device__ int next_power_of_two(int x);

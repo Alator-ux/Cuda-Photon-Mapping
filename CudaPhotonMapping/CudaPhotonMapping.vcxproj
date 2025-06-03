@@ -93,6 +93,7 @@
       <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
       <ExtensibleWholeProgramCompilation>false</ExtensibleWholeProgramCompilation>
       <GenerateLineInfo>false</GenerateLineInfo>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </CudaCompile>
     <CudaLink />
   </ItemDefinitionGroup>
@@ -157,53 +158,93 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <CudaCompile Include="CGPrefixScanSum.cu" />
     <CudaCompile Include="CudaOpenGLUtils.cu" />
     <CudaCompile Include="CudaRandom.cu" />
     <CudaCompile Include="CudaUtils.cu" />
     <CudaCompile Include="Drawer.cu" />
+    <CudaCompile Include="DynamicArrayTest.cu" />
     <CudaCompile Include="GlobalParams.cu" />
+    <CudaCompile Include="HashMap.cu" />
     <CudaCompile Include="Initializer.cu" />
-    <CudaCompile Include="math_functions.cuh" />
+    <CudaCompile Include="KdTree.cu" />
+    <CudaCompile Include="MathFunctions.cu" />
+    <CudaCompile Include="MathFunctions.cuh" />
+    <CudaCompile Include="MediumContent.cu" />
+    <CudaCompile Include="MMInnerStack.cu" />
     <CudaCompile Include="Model.cu" />
+    <CudaCompile Include="Pair.cu" />
+    <CudaCompile Include="PhotonGrid.cu" />
     <CudaCompile Include="PhotonMap.cu" />
     <CudaCompile Include="kernel.cu" />
+    <CudaCompile Include="PhotonMaxHeap.cu" />
+    <CudaCompile Include="PhotonTraceStack.cu" />
+    <CudaCompile Include="PhotonTracing.cu" />
     <CudaCompile Include="Ray.cu" />
+    <CudaCompile Include="RayPlan.cu" />
     <CudaCompile Include="RaytracePlanner.cu" />
+    <CudaCompile Include="SharedMemory.cu" />
     <CudaCompile Include="vec3_funcs.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AABB.cuh" />
+    <ClInclude Include="Array.cuh" />
+    <ClInclude Include="ArrayStack.cuh" />
     <ClInclude Include="ArrayTools.cuh" />
     <ClInclude Include="Camera.cuh" />
+    <ClInclude Include="CGPrefixScanSum.cuh" />
+    <ClInclude Include="CudaCLinks.cuh" />
+    <ClInclude Include="CudaGridSynchronizer.cuh" />
     <ClInclude Include="CudaOpenGLUtils.cuh" />
     <ClInclude Include="CudaRandom.cuh" />
     <ClInclude Include="CudaUtils.cuh" />
     <ClInclude Include="CuOptStack.cuh" />
     <ClInclude Include="DeepLookStack.cuh" />
     <ClInclude Include="Defines.cuh" />
+    <ClInclude Include="DynamicArrayTest.cuh" />
+    <ClInclude Include="EncodableAABB.cuh" />
     <ClInclude Include="FourTuple.cuh" />
     <ClInclude Include="GlobalParams.cuh" />
+    <ClInclude Include="HashMap.cuh" />
     <ClInclude Include="Initializer.cuh" />
+    <ClInclude Include="KdTree.cuh" />
+    <ClInclude Include="List.cuh" />
+    <ClInclude Include="MediumContent.cuh" />
     <ClInclude Include="MediumManager.cuh" />
     <ClInclude Include="Light.cuh" />
     <ClInclude Include="Material.cuh" />
+    <ClInclude Include="MMInnerStack.cuh" />
+    <ClInclude Include="MMOuterStack.cuh" />
     <ClInclude Include="Model.cuh" />
     <ClInclude Include="ModelConstructInfo.cuh" />
     <ClInclude Include="ObjLoader.h" />
     <ClInclude Include="OpenglLayer.h" />
     <ClInclude Include="Pair.cuh" />
+    <ClInclude Include="PathOperator.cuh" />
     <ClInclude Include="Photon.cuh" />
+    <ClInclude Include="PhotonArray.cuh" />
+    <ClInclude Include="PhotonGrid.cuh" />
     <ClInclude Include="PhotonMap.cuh" />
+    <ClInclude Include="PhotonMaxHeap.cuh" />
+    <ClInclude Include="PhotonTraceStack.cuh" />
+    <ClInclude Include="PhotonTracing.cuh" />
+    <ClInclude Include="PrefixScanSum.cuh" />
+    <ClInclude Include="PrescanCommon.cuh" />
     <ClInclude Include="Printer.cuh" />
     <ClInclude Include="Printers.h" />
     <ClInclude Include="PriorityQueue.cuh" />
+    <ClInclude Include="Queue.cuh" />
     <ClInclude Include="Ray.cuh" />
     <ClInclude Include="Drawer.cuh" />
+    <ClInclude Include="RayPlan.cuh" />
+    <ClInclude Include="RayPlanStack.cuh" />
     <ClInclude Include="RaytracePlanner.cuh" />
     <ClInclude Include="Raytracer.cuh" />
     <ClInclude Include="RefractiveTable.cuh" />
     <ClInclude Include="RenderEnums.cuh" />
     <ClInclude Include="Scene.cuh" />
+    <ClInclude Include="SharedMemory.cuh" />
+    <ClInclude Include="SoArray.cuh" />
     <ClInclude Include="Sort.cuh" />
     <ClInclude Include="Stack.cuh" />
     <ClInclude Include="TestablePhotonMap.cuh" />

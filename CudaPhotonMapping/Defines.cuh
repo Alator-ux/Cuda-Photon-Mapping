@@ -1,5 +1,6 @@
 #pragma once
 #include "CudaUtils.cuh"
+#include <curand_kernel.h>
 
 /* RENDER */
 #define TWO_D_THREADS_NUMBER 16
@@ -13,16 +14,22 @@
 #define AABB_BITS_TO_ENCODE_IN 4
 
 /* TYPES */
-#define uint unsigned int
+typedef unsigned int uint;
+
+typedef unsigned long long uint64;
+
+typedef curandStatePhilox4_32_10_t cudaRandomStateT;
 
 //#define USE_SIZE_T_AS_IDX
 
 #ifdef USE_SIZE_T_AS_IDX
-#define idxtype size_t
+typedef size_t idxtype;
 #define IDXTYPE_NONE_VALUE SIZE_MAX
+#define IDX_ONE 1ull
 #else
-#define idxtype uint
+typedef uint idxtype;
 #define IDXTYPE_NONE_VALUE UINT_MAX
+#define IDX_ONE 1u
 #endif
 
 /* CUDA UTIL */
@@ -32,7 +39,11 @@
 // For wild magic
 #ifndef __CUDA_ARCH__
 namespace cooperative_groups {
-	void* this_grid();// { return nullptr; }
+	struct grid_group {
+		static grid_group instance;
+		void sync();
+	};
+	grid_group this_grid();// { return nullptr; }
 }
 #endif
 #ifdef __CUDA_ARCH__
@@ -40,7 +51,7 @@ namespace cooperative_groups {
     cooperative_groups::grid_group grid, bool should_execute = true
 #else
 #define LIST_CUDA_OUTER_PARAMS_DEF  \
-    void* placeholder_param_f = nullptr, bool placeholder_param_s = true /* will be removed by the compiler */
+    cooperative_groups::grid_group placeholder_param_f = cooperative_groups::grid_group::instance, bool placeholder_param_s = true /* will be removed by the compiler */
 #endif
 
 #ifdef __CUDA_ARCH__
@@ -50,20 +61,6 @@ namespace cooperative_groups {
 #define LIST_CUDA_INNER_PARAMS_DEF 
 #endif
 
-//#define CUDA_ONLY_PARAMS_DEF \
-//    CUDA_ONLY_PARAMS_DEF_IMPL()
-//
-//#ifdef __CUDA_ARCH__
-//#define CUDA_ONLY_PARAMS_DEF_IMPL() cooperative_groups::grid_group grid, bool should_execute = true
-//#else
-//#define CUDA_ONLY_PARAMS_DEF_IMPL() void* placeholder_param = nullptr /*will be removed by compiler*/
-//#endif
-//#ifdef __CUDA_ARCH__
-//#define CUDA_ONLY_PARAMS_DEF cooperative_groups::grid_group grid, bool should_execute = true
-//#else
-//#define CUDA_ONLY_PARAMS_DEF void* placeholder_param = nullptr /*will be removed by compiler*/
-//#endif
-
 /* PRESCAN THREADS */
 #define PRESCAN_THREADS 512
 #define PRESCAN_BLOCKS  44
@@ -72,4 +69,5 @@ namespace cooperative_groups {
 										 PRESCAN_BLOCKS <= 8  ? 8  : \
 										 PRESCAN_BLOCKS <= 16 ? 16 : \
 										 PRESCAN_BLOCKS <= 32 ? 32 : 64
+
 										

@@ -279,7 +279,7 @@ cpm::pair<std::vector<ModelConstructInfo>, std::vector<std::string>> loadOBJ(con
                 cur.type = ModelType::Quad;
             }
             else if (ps > 4) {
-                cur.type = ModelType::Polygon;
+                cur.type = ModelType::FlatPolygon;
             }
         }
         else

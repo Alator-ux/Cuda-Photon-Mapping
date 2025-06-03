@@ -6,18 +6,10 @@
 #include "vec2.cuh"
 #include "Material.cuh"
 #include <vector>
-
-namespace cpm {
-    template<typename T>
-    __host__ __device__ void swap(T& first, T& second) {
-        T temp = second;
-        second = first;
-        first = temp;
-    }
-};
+#include "CudaUtils.cuh"
 
 enum ModelType {
-    Triangle, Quad, Polygon
+    Triangle, Quad, FlatPolygon
 };
 
 int model_type_to_primitive_size(ModelType type);

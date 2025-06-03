@@ -125,10 +125,14 @@ public:
 		this->id = other.id;
         this->bounding_box = other.bounding_box;
 	}
-	__host__ __device__ Model(ModelConstructInfo& mci, int id = -1) : bounding_box(mci.positions, mci.size) {
+	__host__ __device__ Model(ModelConstructInfo& mci, int id = -1, bool calculate_aabb = false) : bounding_box(mci.positions, mci.size, calculate_aabb) {
 		this->mci.swap(mci);
 		this->id = id;
 	}
+    __host__ __device__ Model(ModelConstructInfo& mci, int id, const AABB& aabb) : bounding_box(aabb) {
+        this->mci.swap(mci);
+        this->id = id;
+    }
 	__host__ __device__ Model() {
 		this->id = -1;
 	}
@@ -194,23 +198,21 @@ public:
         return n0.add(n1).add(n2).normalize();
     }
     //__device__ cpm::pair<cpm::vec3, cpm::vec3> Model::get_random_point_with_normal(curandState* state) const 
-#ifdef __CUDA_ARCH__
-    __device__ cpm::pair<cpm::vec3, cpm::vec3> get_random_point_with_normal(curandState* state) const {
-        curandState local_state = *state;
 
+    __device__ cpm::pair<cpm::vec3, cpm::vec3> gpu_get_random_point_with_normal(cudaRandomStateT& state) const {
         int start_ind, ind0, ind1, ind2;
         if (mci.type == ModelType::Triangle) {
 
-            start_ind = cpm::fmap_to_range(curand_uniform(&local_state), 0, (mci.size - 3) / 3);
+            start_ind = cpm::imap_to_range(curand_uniform(&state), 0, (mci.size - 3) / 3);
             start_ind *= 3;
             ind0 = start_ind;
             ind1 = start_ind + 1;
             ind2 = start_ind + 2;
         }
         else if (mci.type == ModelType::Quad) {
-            start_ind = cpm::fmap_to_range(curand_uniform(&local_state), 0, (mci.size - 4) / 4);
+            start_ind = cpm::imap_to_range(curand_uniform(&state), 0, (mci.size - 4) / 4);
             start_ind *= 4;
-            if (curand_uniform(&local_state) < 0.5f) {
+            if (curand_uniform(&state) < 0.5f) {
                 ind0 = start_ind;
                 ind1 = start_ind + 1;
                 ind2 = start_ind + 3;
@@ -225,24 +227,22 @@ public:
             printf("Unknown model vertex organization\n");
         }
         cpm::vec3 uvw;
-        uvw.x = curand_uniform(&local_state);
-        uvw.y = cpm::fmap_to_range(curand_uniform(&local_state), uvw.x, 1.f);
+        uvw.x = curand_uniform(&state);
+        uvw.y = cpm::fmap_to_range(curand_uniform(&state), 0.f, 1.f - uvw.x);
         uvw.z = 1.f - uvw.x - uvw.y;
 
         cpm::vec3 point = uvw.x * mci.positions[ind0] +
             uvw.y * mci.positions[ind1] +
             uvw.z * mci.positions[ind2];
+
         cpm::vec3 normal = uvw.x * mci.normals[ind0] +
             uvw.y * mci.normals[ind1] +
             uvw.z * mci.normals[ind2];
 
-        *state = local_state;
-
         return { point, normal };
     }
-#else
-    // __host__ cpm::pair<cpm::vec3, cpm::vec3> Model::get_random_point_with_normal() const 
-    __host__ cpm::pair<cpm::vec3, cpm::vec3> get_random_point_with_normal(cpm::Random rnd_gen) const {
+
+    __host__ cpm::pair<cpm::vec3, cpm::vec3> cpu_get_random_point_with_normal(cpm::Random rnd_gen) const {
         int start_ind, ind0, ind1, ind2;
         if (mci.type == ModelType::Triangle) {
 
@@ -283,7 +283,6 @@ public:
 
         return { point, normal };
     }
-#endif
 
     /* =============
     *  Other Section
