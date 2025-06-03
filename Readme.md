@@ -22,6 +22,7 @@
 - CUDA Toolkit 12.2
 - Видеокарта NVIDIA GeForce GTX 1660
 - ОС Windows
+- C++ 14
 
 ## Сборка и запуск
 
